@@ -3,6 +3,7 @@ import { Playfair_Display, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google
 import "./globals.css";
 import { ChatFAB } from "@/components/chatbot/ChatFAB";
 import { AuthPrompt } from "@/components/auth/AuthPrompt";
+import { Analytics } from "@vercel/analytics/next";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -68,6 +69,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {/* AI Assistant FAB */}
         <ChatFAB />
+
+        {/* Vercel Web Analytics */}
+        <Analytics />
       </body>
     </html>
   );
