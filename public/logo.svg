@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 340" fill="none">
+  <!-- Shield outer frame -->
+  <path d="M130 10 L230 40 L230 180 Q230 280 130 320 Q30 280 30 180 L30 40 Z"
+    fill="#0B1526" stroke="#F59E0B" stroke-width="2.5"/>
+
+  <!-- Shield top horizontal divider -->
+  <line x1="30" y1="175" x2="230" y2="175" stroke="#F59E0B" stroke-width="1.2" opacity="0.5"/>
+
+  <!-- Top corner flourishes -->
+  <line x1="30" y1="40" x2="30" y2="60" stroke="#F59E0B" stroke-width="1.5"/>
+  <line x1="30" y1="40" x2="50" y2="40" stroke="#F59E0B" stroke-width="1.5"/>
+  <line x1="230" y1="40" x2="230" y2="60" stroke="#F59E0B" stroke-width="1.5"/>
+  <line x1="230" y1="40" x2="210" y2="40" stroke="#F59E0B" stroke-width="1.5"/>
+
+  <!-- Open codex / book (top half of shield) -->
+  <!-- Book outer frame -->
+  <rect x="62" y="52" width="136" height="102" rx="6"
+    fill="#0B1526" stroke="#F59E0B" stroke-width="1.8"/>
+
+  <!-- Book spine center line -->
+  <line x1="130" y1="52" x2="130" y2="154" stroke="#F59E0B" stroke-width="1.5"/>
+
+  <!-- Left page text lines -->
+  <line x1="74" y1="72" x2="122" y2="72" stroke="#94A3B8" stroke-width="1.2" opacity="0.5"/>
+  <line x1="74" y1="84" x2="122" y2="84" stroke="#94A3B8" stroke-width="1.2" opacity="0.5"/>
+  <line x1="74" y1="96" x2="122" y2="96" stroke="#94A3B8" stroke-width="1.2" opacity="0.5"/>
+  <line x1="74" y1="108" x2="122" y2="108" stroke="#94A3B8" stroke-width="1.2" opacity="0.5"/>
+  <line x1="74" y1="120" x2="108" y2="120" stroke="#94A3B8" stroke-width="1.2" opacity="0.5"/>
+
+  <!-- Right page text lines -->
+  <line x1="138" y1="72" x2="186" y2="72" stroke="#94A3B8" stroke-width="1.2" opacity="0.5"/>
+  <line x1="138" y1="84" x2="186" y2="84" stroke="#94A3B8" stroke-width="1.2" opacity="0.5"/>
+  <!-- Highlighted amber line -->
+  <rect x="138" y="90" width="48" height="10" rx="2" fill="rgba(245,158,11,0.15)"/>
+  <line x1="138" y1="96" x2="178" y2="96" stroke="#F59E0B" stroke-width="1.5"/>
+  <!-- Cursor arrow -->
+  <polygon points="182,96 178,92 178,100" fill="#F59E0B"/>
+  <line x1="138" y1="108" x2="186" y2="108" stroke="#94A3B8" stroke-width="1.2" opacity="0.5"/>
+  <line x1="138" y1="120" x2="172" y2="120" stroke="#94A3B8" stroke-width="1.2" opacity="0.5"/>
+  <line x1="138" y1="132" x2="186" y2="132" stroke="#94A3B8" stroke-width="1.2" opacity="0.5"/>
+  <line x1="138" y1="144" x2="165" y2="144" stroke="#94A3B8" stroke-width="1.2" opacity="0.5"/>
+
+  <!-- Circular seal (bottom half of shield) -->
+  <!-- Outer tick ring -->
+  <circle cx="130" cy="237" r="50" stroke="#F59E0B" stroke-width="1.2" opacity="0.35" fill="none"
+    stroke-dasharray="3 4.3"/>
+  <!-- Inner seal circle -->
+  <circle cx="130" cy="237" r="38" stroke="#F59E0B" stroke-width="1.5" fill="#0B1526"/>
+  <!-- Inner ring -->
+  <circle cx="130" cy="237" r="28" stroke="#F59E0B" stroke-width="0.8" opacity="0.4" fill="none"/>
+
+  <!-- Seal text: DPDPA -->
+  <text x="130" y="232" text-anchor="middle"
+    font-family="Georgia, serif" font-size="9.5" font-weight="600"
+    fill="#F59E0B" letter-spacing="3">DPDPA</text>
+  <!-- Seal divider line -->
+  <line x1="110" y1="237" x2="150" y2="237" stroke="#F59E0B" stroke-width="0.8" opacity="0.5"/>
+  <!-- Seal text: GDPR -->
+  <text x="130" y="249" text-anchor="middle"
+    font-family="Georgia, serif" font-size="9.5" font-weight="600"
+    fill="#F59E0B" letter-spacing="5">GDPR</text>
+
+  <!-- Shield bottom point ornament -->
+  <circle cx="130" cy="322" r="3" fill="#F59E0B" opacity="0.7"/>
+</svg>
