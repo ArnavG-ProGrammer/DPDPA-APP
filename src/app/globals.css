@@ -2,56 +2,125 @@
 @import "tw-animate-css";
 
 /* ═══════════════════════════════════════════════
-   DATA CREST — Design System v2
+   DATA CREST — Design System v3
    Privacy Law Decoded
 ═══════════════════════════════════════════════ */
 
 :root {
   /* ── Backgrounds ── */
-  --bg-primary:    #030712;
-  --bg-secondary:  #080F1F;
-  --card:          #0B1526;
-  --card-alt:      #0E1A2E;
-  --card-hover:    #111f38;
+  --bg-0: #020812;
+  --bg-1: #060D1A;
+  --bg-2: #0A1422;
+  --bg-3: #0E1B2E;
+  --bg-4: #121F33;
 
-  /* ── Brand ── */
-  --amber:             #F59E0B;
-  --amber-light:       #FCD34D;
-  --amber-dim:         rgba(245,158,11,0.08);
-  --amber-border:      rgba(245,158,11,0.15);
-  --amber-border-h:    rgba(245,158,11,0.35);
-  --teal:              #06B6D4;
-  --teal-dim:          rgba(6,182,212,0.08);
-  --blue:              #3B82F6;
-  --blue-dim:          rgba(59,130,246,0.08);
-  --purple:            #7C3AED;
-  --purple-dim:        rgba(124,58,237,0.08);
-  --green:             #059669;
-  --green-dim:         rgba(5,150,105,0.08);
+  /* legacy aliases (keep existing components working) */
+  --bg-primary:    #020812;
+  --bg-secondary:  #060D1A;
+  --card:          #0A1422;
+  --card-alt:      #0E1B2E;
+  --card-hover:    #121F33;
+
+  /* ── Amber — primary accent ── */
+  --amber-9: #92400E;
+  --amber-7: #B45309;
+  --amber-5: #D97706;
+  --amber-4: #F59E0B;
+  --amber-3: #FBB93A;
+  --amber-2: #FCD34D;
+  --amber-1: #FEF3C7;
+
+  /* legacy aliases */
+  --amber:        #F59E0B;
+  --amber-light:  #FCD34D;
+  --amber-dim:    rgba(245,158,11,0.08);
+  --amber-border:   rgba(245,158,11,0.15);
+  --amber-border-h: rgba(245,158,11,0.35);
+
+  /* ── Teal — DPDP Rules accent ── */
+  --teal-5: #0E7490;
+  --teal-4: #0891B2;
+  --teal-3: #06B6D4;
+  --teal-2: #67E8F9;
+  --teal:       #06B6D4;
+  --teal-dim:   rgba(6,182,212,0.08);
+
+  /* ── Blue — GDPR accent ── */
+  --blue-5: #1D4ED8;
+  --blue-4: #2563EB;
+  --blue-3: #3B82F6;
+  --blue-2: #93C5FD;
+  --blue:     #3B82F6;
+  --blue-dim: rgba(59,130,246,0.08);
+
+  /* ── Purple — Notifications accent ── */
+  --purple-5: #6D28D9;
+  --purple-4: #7C3AED;
+  --purple-3: #8B5CF6;
+  --purple-2: #C4B5FD;
+  --purple:     #7C3AED;
+  --purple-dim: rgba(124,58,237,0.08);
+
+  /* ── Green — success states ── */
+  --green-4: #059669;
+  --green-3: #10B981;
+  --green-2: #6EE7B7;
+  --green:     #059669;
+  --green-dim: rgba(5,150,105,0.08);
+
+  /* ── Red — penalties, warnings ── */
+  --red-4: #DC2626;
+  --red-3: #EF4444;
 
   /* ── Text ── */
+  --text-0: #F8F4EC;
+  --text-1: #E8E0CE;
+  --text-2: #B8B0A0;
+  --text-3: #7A7468;
+  --text-4: #4A4640;
   --text-primary:   #F0EAD6;
   --text-secondary: #94A3B8;
   --text-muted:     #4B5563;
 
   /* ── Borders ── */
+  --border-0: rgba(245,158,11,0.08);
+  --border-1: rgba(245,158,11,0.15);
+  --border-2: rgba(245,158,11,0.28);
+  --border-3: rgba(245,158,11,0.45);
   --border:         rgba(245,158,11,0.15);
   --border-hover:   rgba(245,158,11,0.3);
   --border-subtle:  rgba(255,255,255,0.06);
 
-  /* ── Glass ── */
-  --glass-nav:  rgba(3,7,18,0.88);
-  --glass-card: rgba(11,21,38,0.75);
-
   /* ── Radius ── */
+  --r-sm:   6px;
+  --r-md:   10px;
+  --r-lg:   16px;
+  --r-xl:   22px;
+  --r-full: 9999px;
   --radius:    0.75rem;
   --radius-lg: 1.25rem;
   --radius-xl: 1.75rem;
 
+  /* ── Shadows ── */
+  --shadow-card:       0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.3);
+  --shadow-card-hover: 0 4px 24px rgba(0,0,0,0.5), 0 0 40px rgba(245,158,11,0.06);
+  --shadow-amber-glow: 0 0 32px rgba(245,158,11,0.12);
+
+  /* ── Transitions ── */
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+  --duration-fast: 150ms;
+  --duration-base: 280ms;
+  --duration-slow: 420ms;
+
+  /* ── Glass ── */
+  --glass-nav:  rgba(2,8,18,0.90);
+  --glass-card: rgba(6,13,26,0.75);
+
   /* ── Shadcn compat ── */
-  --background:         var(--bg-primary);
-  --foreground:         var(--text-primary);
-  --ring:               var(--amber);
+  --background: var(--bg-0);
+  --foreground: var(--text-primary);
+  --ring:       var(--amber-4);
 }
 
 /* ─────────────────────────────────────────────
@@ -89,32 +158,82 @@ h1, h2, h3, h4, h5, h6 {
 ::-webkit-scrollbar-thumb:hover { background: var(--amber); }
 
 /* ─────────────────────────────────────────────
-   ANIMATED DOT GRID
+   BACKGROUND LAYER SYSTEM
+   Layer 1 — base gradient   (.bg-base)
+   Layer 2 — dot grid        (.dot-grid)
+   Layer 3 — noise texture   (.noise-overlay)
+   Layer 4 — rule lines      (.rule-lines)
 ───────────────────────────────────────────── */
-.dot-grid {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image: radial-gradient(circle, rgba(245,158,11,0.10) 1px, transparent 1px);
-  background-size: 30px 30px;
-  animation: dot-drift 25s linear infinite;
-}
 
-@keyframes dot-drift {
-  from { background-position: 0 0; }
-  to   { background-position: 0 -300px; }
-}
-
-.mesh-gradient {
+/* Layer 1 — Base gradient */
+.bg-base {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 70% 55% at -5% 0%,   rgba(245,158,11,0.05) 0%, transparent 65%),
-    radial-gradient(ellipse 55% 70% at 105% 100%, rgba(6,182,212,0.04)  0%, transparent 65%);
+    radial-gradient(ellipse 100% 70% at 8% 0%,
+      rgba(245,158,11,0.055) 0%, transparent 65%),
+    radial-gradient(ellipse 70% 90% at 95% 100%,
+      rgba(6,182,212,0.035) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 50% 50%,
+      rgba(2,8,18,0) 0%, rgba(2,8,18,0.6) 100%),
+    #020812;
 }
+
+/* Layer 2 — Dot grid (drifts downward) */
+.dot-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle at center,
+    rgba(245,158,11,0.055) 1px,
+    transparent 1px
+  );
+  background-size: 40px 40px;
+  animation: gridDrift 30s linear infinite;
+}
+
+@keyframes gridDrift {
+  from { transform: translateY(0); }
+  to   { transform: translateY(40px); }
+}
+
+/* Layer 3 — Noise / grain texture */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 300px 300px;
+}
+
+/* Layer 4 — Horizontal rule lines at 33% and 66% */
+.rule-lines {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.rule-lines::before,
+.rule-lines::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 1px solid rgba(245,158,11,0.04);
+}
+.rule-lines::before { top: 33.333%; }
+.rule-lines::after  { top: 66.667%; }
+
+/* legacy alias — kept so any code referencing .mesh-gradient still works */
+.mesh-gradient { display: none; }
 
 /* ─────────────────────────────────────────────
    PAGE TRANSITIONS

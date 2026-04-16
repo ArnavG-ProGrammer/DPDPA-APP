@@ -56,8 +56,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body className="min-h-full antialiased">
         {/* Persistent background layers */}
-        <div className="dot-grid" aria-hidden="true" />
-        <div className="mesh-gradient" aria-hidden="true" />
+        <div className="bg-base"       aria-hidden="true" />
+        <div className="dot-grid"      aria-hidden="true" />
+        <div className="noise-overlay" aria-hidden="true" />
+        <div className="rule-lines"    aria-hidden="true" />
 
         {/* Page content */}
         <div style={{ position: "relative", zIndex: 1 }}>
