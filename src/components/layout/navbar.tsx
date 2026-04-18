@@ -218,7 +218,7 @@ export function Navbar({ accentColor }: NavbarProps) {
       </Link>
 
       {/* CENTER — Breadcrumb */}
-      <div style={{ flex: 1, paddingX: 32, display: "flex", justifyContent: "center" }}>
+      <div style={{ flex: 1, paddingLeft: 32, paddingRight: 32, display: "flex", justifyContent: "center" }}>
         <BreadcrumbNav />
       </div>
 
