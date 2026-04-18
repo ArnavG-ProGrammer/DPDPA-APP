@@ -2,64 +2,56 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Compass, BookOpen, List, FileText, Lightbulb } from "lucide-react";
+import { ArrowRight, Compass, BookOpen, List, FileText, Lightbulb, Scale, ScrollText, Landmark, Bell, ArrowUpRight } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 
 const CARDS = [
   {
     href: "/dpdpa",
-    icon: "⚖️",
+    icon: Scale,
     label: "DPDPA 2023",
     title: "Digital Personal Data Protection Act",
-    desc: "India's landmark privacy legislation — governing collection, processing and storage of personal data.",
-    region: "India 🇮🇳",
+    fullName: "India's Digital Personal Data Protection Act",
+    region: "India",
     year: "2023",
-    accent: "#F59E0B",
-    accentDim: "rgba(245,158,11,0.12)",
-    accentBorder: "rgba(245,158,11,0.35)",
-    glow: "rgba(245,158,11,0.2)",
+    accent: "var(--amber-4)",
+    accentValue: "#F59E0B",
     delay: "0.08s",
   },
   {
     href: "/dpdp-rules",
-    icon: "📋",
+    icon: ScrollText,
     label: "DPDP Rules 2025",
     title: "Digital Personal Data Protection Rules",
-    desc: "Subordinate legislation specifying implementation mechanisms, timelines, and technical standards.",
-    region: "India 🇮🇳",
+    fullName: "Subordinate legislation implementing DPDPA",
+    region: "India",
     year: "2025",
-    accent: "#06B6D4",
-    accentDim: "rgba(6,182,212,0.12)",
-    accentBorder: "rgba(6,182,212,0.35)",
-    glow: "rgba(6,182,212,0.2)",
+    accent: "var(--teal-3)",
+    accentValue: "#06B6D4",
     delay: "0.16s",
   },
   {
     href: "/gdpr",
-    icon: "🏛️",
+    icon: Landmark,
     label: "GDPR 2018",
     title: "General Data Protection Regulation",
-    desc: "The world's most influential privacy regulation, governing the EU since May 25, 2018.",
-    region: "EU 🇪🇺",
+    fullName: "EU General Data Protection Regulation",
+    region: "EU",
     year: "2018",
-    accent: "#3B82F6",
-    accentDim: "rgba(59,130,246,0.12)",
-    accentBorder: "rgba(59,130,246,0.35)",
-    glow: "rgba(59,130,246,0.2)",
+    accent: "var(--blue-3)",
+    accentValue: "#3B82F6",
     delay: "0.24s",
   },
   {
     href: "/notifications",
-    icon: "🔔",
+    icon: Bell,
     label: "Notifications",
     title: "Official Gazette Notifications",
-    desc: "Official Government of India notifications and gazette orders tracking the DPDPA journey.",
-    region: "India 🇮🇳",
+    fullName: "Government of India gazette orders",
+    region: "India",
     year: "2023–",
-    accent: "#7C3AED",
-    accentDim: "rgba(124,58,237,0.12)",
-    accentBorder: "rgba(124,58,237,0.35)",
-    glow: "rgba(124,58,237,0.2)",
+    accent: "var(--purple-3)",
+    accentValue: "#8B5CF6",
     delay: "0.32s",
   },
 ];
@@ -74,100 +66,198 @@ const JOURNEY = [
 
 function SectionCard({ card }: { card: typeof CARDS[0] }) {
   const [hovered, setHovered] = useState(false);
+  const [pressed, setPressed] = useState(false);
+  const IconComponent = card.icon;
+
   return (
     <div
-      className={`card-${CARDS.indexOf(card) + 1}`}
+      className={`fade-up`}
       style={{ animationDelay: card.delay }}
     >
       <Link
         href={card.href}
         onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
+        onMouseLeave={() => { setHovered(false); setPressed(false); }}
+        onMouseDown={() => setPressed(true)}
+        onMouseUp={() => setPressed(false)}
         style={{
           display: "block",
-          background: hovered ? "#111f38" : "#0B1526",
-          borderTop: `2px solid ${card.accent}`,
-          borderRight: `1px solid ${hovered ? card.accentBorder : "rgba(245,158,11,0.15)"}`,
-          borderBottom: `1px solid ${hovered ? card.accentBorder : "rgba(245,158,11,0.15)"}`,
-          borderLeft: `1px solid ${hovered ? card.accentBorder : "rgba(245,158,11,0.15)"}`,
-          borderRadius: 20,
-          padding: "28px",
+          background: "var(--bg-2)",
+          border: `1px solid var(--border-1)`,
+          borderTop: `2px solid rgba(${
+            card.accentValue === "#F59E0B" ? "245, 158, 11" :
+            card.accentValue === "#06B6D4" ? "6, 182, 212" :
+            card.accentValue === "#3B82F6" ? "59, 130, 246" :
+            "139, 92, 246"
+          }, 0.35)`,
+          borderRadius: "var(--r-xl)",
+          padding: 32,
           textDecoration: "none",
           position: "relative",
           overflow: "hidden",
-          transform: hovered ? "translateY(-8px)" : "translateY(0)",
-          boxShadow: hovered ? `0 20px 60px rgba(0,0,0,0.5), 0 0 40px ${card.glow}` : "0 4px 20px rgba(0,0,0,0.3)",
-          transition: "all 0.35s cubic-bezier(0.22,1,0.36,1)",
+          cursor: "pointer",
+          transform: pressed ? "translateY(-3px)" : (hovered ? "translateY(-6px)" : "translateY(0)"),
+          boxShadow: hovered ? "var(--shadow-card-hover)" : "var(--shadow-card)",
+          transition: `all ${pressed ? "80ms" : "var(--duration-base)"} var(--ease-out)`,
+          borderColor: hovered ? `rgba(${
+            card.accentValue === "#F59E0B" ? "245, 158, 11" :
+            card.accentValue === "#06B6D4" ? "6, 182, 212" :
+            card.accentValue === "#3B82F6" ? "59, 130, 246" :
+            "139, 92, 246"
+          }, 0.3)` : "var(--border-1)",
         }}
       >
-        {/* Glow orb */}
+        {/* Decorative background icon */}
         <div style={{
-          position: "absolute", top: -50, right: -50, width: 160, height: 160,
-          borderRadius: "50%", background: `radial-gradient(circle, ${card.accentDim}, transparent 70%)`,
-          opacity: hovered ? 1 : 0, transition: "opacity 0.4s",
-        }} />
-
-        {/* Top: icon + label */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
-          <div style={{
-            width: 52, height: 52, borderRadius: 16,
-            background: card.accentDim, border: `1px solid ${card.accentBorder}`,
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22,
-          }}>
-            {card.icon}
-          </div>
-          <div style={{
-            fontSize: 10, fontWeight: 700, letterSpacing: "0.15em",
-            color: card.accent, fontFamily: "var(--font-ibm), sans-serif",
-            textTransform: "uppercase",
-            opacity: hovered ? 1 : 0.8, transition: "opacity 0.3s",
-          }}>
-            {card.label}
-          </div>
+          position: "absolute",
+          bottom: -10,
+          right: -10,
+          width: 80,
+          height: 80,
+          opacity: 0.03,
+          pointerEvents: "none",
+          color: card.accentValue,
+        }}>
+          <IconComponent size={80} strokeWidth={1.5} />
         </div>
 
-        {/* Title */}
-        <h3 style={{
-          fontFamily: "var(--font-playfair), Georgia, serif",
-          fontSize: 19, fontWeight: 700, color: "#F0EAD6",
-          lineHeight: 1.3, marginBottom: 10,
-        }}>
-          {card.title}
-        </h3>
-
-        {/* Description */}
-        <p style={{
-          fontFamily: "var(--font-ibm), sans-serif",
-          fontSize: 13.5, lineHeight: 1.7, color: "#94A3B8",
-          marginBottom: 24,
-        }}>
-          {card.desc}
-        </p>
-
-        {/* Footer */}
+        {/* Top-right arrow */}
         <div style={{
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.06)",
+          position: "absolute",
+          top: 22,
+          right: 22,
+          color: "var(--text-4)",
+          transition: `all var(--duration-fast) var(--ease-out)`,
+          transform: hovered ? "translate(3px, -3px)" : "translate(0, 0)",
         }}>
-          <span style={{
-            fontSize: 11, fontWeight: 600, padding: "4px 12px", borderRadius: 20,
-            background: card.accentDim, border: `1px solid ${card.accentBorder}`,
-            color: card.accent, fontFamily: "var(--font-ibm), sans-serif",
-          }}>
-            {card.region}
-          </span>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ fontSize: 12, color: "#4B5563", fontFamily: "var(--font-ibm), sans-serif" }}>
+          <ArrowUpRight size={16} />
+        </div>
+
+        {/* Main content */}
+        <div style={{ position: "relative", zIndex: 1 }}>
+          {/* Icon container */}
+          <div
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: "var(--r-md)",
+              background: `linear-gradient(135deg, rgba(${
+                card.accentValue === "#F59E0B" ? "245, 158, 11" :
+                card.accentValue === "#06B6D4" ? "6, 182, 212" :
+                card.accentValue === "#3B82F6" ? "59, 130, 246" :
+                "139, 92, 246"
+              }, 0.12), rgba(${
+                card.accentValue === "#F59E0B" ? "245, 158, 11" :
+                card.accentValue === "#06B6D4" ? "6, 182, 212" :
+                card.accentValue === "#3B82F6" ? "59, 130, 246" :
+                "139, 92, 246"
+              }, 0.04))`,
+              border: `1px solid rgba(${
+                card.accentValue === "#F59E0B" ? "245, 158, 11" :
+                card.accentValue === "#06B6D4" ? "6, 182, 212" :
+                card.accentValue === "#3B82F6" ? "59, 130, 246" :
+                "139, 92, 246"
+              }, 0.2)`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: 20,
+            }}
+          >
+            <IconComponent size={20} color={card.accentValue} strokeWidth={1.5} />
+          </div>
+
+          {/* Label */}
+          <div
+            style={{
+              fontFamily: "var(--font-mono), monospace",
+              fontSize: 10,
+              fontWeight: 500,
+              letterSpacing: "1.5px",
+              textTransform: "uppercase",
+              color: card.accentValue,
+              marginBottom: 8,
+            }}
+          >
+            {card.label}
+          </div>
+
+          {/* Title */}
+          <h3
+            style={{
+              fontFamily: "var(--font-playfair), Georgia, serif",
+              fontSize: 22,
+              fontWeight: 700,
+              color: "var(--text-0)",
+              lineHeight: 1.2,
+              marginBottom: 10,
+            }}
+          >
+            {card.title}
+          </h3>
+
+          {/* Full name subtitle */}
+          <p
+            style={{
+              fontFamily: "var(--font-ibm), sans-serif",
+              fontSize: 12,
+              fontWeight: 400,
+              color: "var(--text-3)",
+              lineHeight: 1.5,
+              marginBottom: 20,
+            }}
+          >
+            {card.fullName}
+          </p>
+
+          {/* Footer: region + year */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 12,
+            }}
+          >
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "4px 10px",
+                background: `rgba(${
+                  card.accentValue === "#F59E0B" ? "245, 158, 11" :
+                  card.accentValue === "#06B6D4" ? "6, 182, 212" :
+                  card.accentValue === "#3B82F6" ? "59, 130, 246" :
+                  "139, 92, 246"
+                }, 0.08)`,
+                border: `1px solid rgba(${
+                  card.accentValue === "#F59E0B" ? "245, 158, 11" :
+                  card.accentValue === "#06B6D4" ? "6, 182, 212" :
+                  card.accentValue === "#3B82F6" ? "59, 130, 246" :
+                  "139, 92, 246"
+                }, 0.2)`,
+                borderRadius: "var(--r-full)",
+                fontFamily: "var(--font-ibm), sans-serif",
+                fontSize: 11,
+                fontWeight: 600,
+                color: card.accentValue,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {card.region === "India" ? "🇮🇳" : "🇪🇺"} {card.region}
+            </div>
+
+            <div
+              style={{
+                fontFamily: "var(--font-mono), monospace",
+                fontSize: 11,
+                fontWeight: 500,
+                color: "var(--text-4)",
+                whiteSpace: "nowrap",
+              }}
+            >
               {card.year}
-            </span>
-            <div style={{
-              width: 24, height: 24, borderRadius: "50%",
-              background: hovered ? card.accent : "transparent",
-              border: `1px solid ${hovered ? card.accent : "rgba(245,158,11,0.3)"}`,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              transition: "all 0.3s",
-            }}>
-              <ArrowRight size={12} color={hovered ? "#030712" : "#F59E0B"} />
             </div>
           </div>
         </div>
@@ -394,11 +484,15 @@ export default function Home() {
       </section>
 
       {/* ══════════════ CARDS GRID ══════════════ */}
-      <section style={{ padding: "0 24px 100px", maxWidth: 1200, margin: "0 auto" }}>
+      <section style={{
+        maxWidth: 1080,
+        margin: "0 auto",
+        padding: "0 clamp(24px, 5vw, 48px) 72px",
+      }}>
         <div style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: 24,
+          gap: 14,
         }}>
           {CARDS.map(card => <SectionCard key={card.href} card={card} />)}
         </div>
