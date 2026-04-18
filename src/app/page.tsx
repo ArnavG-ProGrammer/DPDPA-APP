@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Compass, BookOpen, List, FileText, Lightbulb } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 
 const CARDS = [
@@ -65,11 +65,11 @@ const CARDS = [
 ];
 
 const JOURNEY = [
-  { icon: "🚀", label: "Start", active: true },
-  { icon: "📚", label: "Select Law", active: false },
-  { icon: "📖", label: "Chapter", active: false },
-  { icon: "🔍", label: "Section", active: false },
-  { icon: "💡", label: "Deep Dive", active: false },
+  { icon: Compass, label: "Start", active: true },
+  { icon: BookOpen, label: "Select Law", active: false },
+  { icon: List, label: "Chapter", active: false },
+  { icon: FileText, label: "Section", active: false },
+  { icon: Lightbulb, label: "Deep Dive", active: false },
 ];
 
 function SectionCard({ card }: { card: typeof CARDS[0] }) {
@@ -185,82 +185,180 @@ export default function Home() {
 
       {/* ══════════════ HERO ══════════════ */}
       <section style={{
-        minHeight: "100vh", display: "flex", flexDirection: "column",
-        alignItems: "center", justifyContent: "center",
-        padding: "100px 24px 60px", textAlign: "center",
+        padding: "clamp(48px, 8vw, 72px) clamp(24px, 5vw, 48px) 48px",
+        maxWidth: 1080,
+        margin: "0 auto",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        textAlign: "center",
+        minHeight: "100vh",
+        justifyContent: "center",
       }}>
-        {/* Eyebrow */}
+        {/* Eyebrow line */}
         <div className="fade-up" style={{
-          fontSize: 10, fontWeight: 700, letterSpacing: "0.32em",
-          color: "#F59E0B", fontFamily: "var(--font-ibm), sans-serif",
-          textTransform: "uppercase", marginBottom: 28,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 12,
+          marginBottom: 18,
+          fontFamily: "var(--font-ibm), sans-serif",
+          fontSize: 11,
+          fontWeight: 600,
+          letterSpacing: "2.5px",
+          textTransform: "uppercase",
+          color: "var(--amber-4)",
         }}>
+          <div style={{
+            width: 28,
+            height: 1,
+            backgroundColor: "var(--amber-4)",
+            display: "inline-block",
+          }} />
           Your Privacy Law Journey
+          <div style={{
+            width: 28,
+            height: 1,
+            backgroundColor: "var(--amber-4)",
+            display: "inline-block",
+          }} />
         </div>
 
-        {/* Main title */}
+        {/* Main heading — 3 lines */}
         <h1 className="fade-up-1" style={{
           fontFamily: "var(--font-playfair), Georgia, serif",
-          fontSize: "clamp(2.6rem, 7vw, 5.5rem)",
-          fontWeight: 700, lineHeight: 1.1,
-          color: "#F0EAD6", maxWidth: 820, marginBottom: 24,
+          fontSize: "clamp(36px, 7vw, 58px)",
+          fontWeight: 400,
+          lineHeight: 1.08,
+          color: "var(--text-1)",
+          marginBottom: 20,
+          maxWidth: 1080,
         }}>
-          Navigate the{" "}
-          <span className="shimmer-amber">Digital Privacy</span>
-          {" "}Landscape
+          Navigate the
+          <div style={{
+            background: "linear-gradient(90deg, var(--amber-4) 0%, var(--amber-2) 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            fontWeight: 700,
+            display: "inline-block",
+            marginLeft: 8,
+            marginRight: 8,
+          }}>
+            Digital Privacy
+          </div>
+          <br />
+          Landscape
         </h1>
 
         {/* Subtitle */}
         <p className="fade-up-2" style={{
           fontFamily: "var(--font-ibm), sans-serif",
-          fontSize: 16, lineHeight: 1.75, color: "#94A3B8",
-          maxWidth: 520, marginBottom: 52,
+          fontSize: 15,
+          fontWeight: 400,
+          lineHeight: 1.75,
+          color: "var(--text-2)",
+          maxWidth: 520,
+          marginBottom: 48,
         }}>
-          A journey-based companion for India&apos;s DPDPA 2023, DPDP Rules 2025,
-          and EU GDPR — with expert cross-references and plain-language explanations.
+          An interactive journey through India&apos;s Digital Personal Data Protection Act 2023 and the EU GDPR — studied provision by provision, chapter by chapter.
         </p>
 
-        {/* Journey nodes */}
+        {/* Journey path */}
         <div className="fade-up-3" style={{
-          display: "flex", alignItems: "center", gap: 0,
-          marginBottom: 60, flexWrap: "nowrap",
+          display: "flex",
+          alignItems: "center",
+          gap: 0,
+          marginBottom: 64,
+          overflowX: "auto",
+          padding: "8px 0",
+          width: "100%",
+          justifyContent: "center",
         }}>
-          {JOURNEY.map((node, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center" }}>
-              {/* Connector line */}
-              {i > 0 && (
-                <div style={{
-                  width: "clamp(28px, 5vw, 64px)", height: 1,
-                  background: i === 1 ? "linear-gradient(90deg,#F59E0B,rgba(245,158,11,0.3))" : "rgba(255,255,255,0.08)",
-                }} />
-              )}
-              {/* Node */}
-              <div style={{ textAlign: "center" }}>
-                <div
-                  className={node.active ? "node-active" : ""}
-                  style={{
-                    width: node.active ? 52 : 44, height: node.active ? 52 : 44,
-                    borderRadius: "50%",
-                    background: node.active ? "rgba(245,158,11,0.15)" : "rgba(255,255,255,0.04)",
-                    border: `1.5px solid ${node.active ? "#F59E0B" : "rgba(255,255,255,0.1)"}`,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: node.active ? 22 : 18, marginBottom: 6,
-                    transition: "all 0.3s",
-                  }}
-                >
-                  {node.icon}
-                </div>
-                <div style={{
-                  fontSize: 9, fontWeight: 600, letterSpacing: "0.08em",
-                  color: node.active ? "#F59E0B" : "#4B5563",
-                  fontFamily: "var(--font-ibm), sans-serif",
-                  textTransform: "uppercase",
-                }}>
-                  {node.label}
+          {JOURNEY.map((node, i) => {
+            const IconComponent = node.icon;
+            const isCompleted = i === 0; // Start is completed
+            const isCurrent = node.active;
+
+            return (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 0 }}>
+                {/* Connector line before node */}
+                {i > 0 && (
+                  <div style={{
+                    flex: 1,
+                    minWidth: 32,
+                    maxWidth: 80,
+                    height: 1,
+                    background: isCompleted
+                      ? "rgba(245, 158, 11, 0.4)"
+                      : "linear-gradient(90deg, var(--border-2), var(--border-1))",
+                    position: "relative",
+                    top: -14,
+                  }} />
+                )}
+
+                {/* Node circle */}
+                <div style={{ textAlign: "center", minWidth: "fit-content" }}>
+                  <div
+                    style={{
+                      width: 42,
+                      height: 42,
+                      borderRadius: "50%",
+                      background: isCurrent
+                        ? "rgba(245,158,11,0.10)"
+                        : isCompleted
+                          ? "rgba(245,158,11,0.06)"
+                          : "var(--bg-3)",
+                      border: `1.5px solid ${
+                        isCurrent
+                          ? "var(--amber-4)"
+                          : isCompleted
+                            ? "var(--amber-7)"
+                            : "var(--border-1)"
+                      }`,
+                      boxShadow: isCurrent
+                        ? "0 0 0 4px rgba(245,158,11,0.08)"
+                        : "none",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      transition: "all var(--duration-base) var(--ease-out)",
+                    }}
+                  >
+                    <IconComponent
+                      size={16}
+                      strokeWidth={1.5}
+                      color={
+                        isCurrent
+                          ? "var(--amber-4)"
+                          : isCompleted
+                            ? "var(--amber-5)"
+                            : "var(--text-3)"
+                      }
+                    />
+                  </div>
+
+                  {/* Label below circle */}
+                  <div
+                    style={{
+                      fontFamily: "var(--font-ibm), sans-serif",
+                      fontSize: 10,
+                      fontWeight: 600,
+                      letterSpacing: "0.8px",
+                      textTransform: "uppercase",
+                      color: isCurrent ? "var(--amber-4)" : "var(--text-3)",
+                      marginTop: 8,
+                      textAlign: "center",
+                      whiteSpace: "nowrap",
+                      transition: "color var(--duration-base) var(--ease-out)",
+                    }}
+                  >
+                    {node.label}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* CTA button */}
