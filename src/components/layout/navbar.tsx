@@ -111,7 +111,7 @@ function IconButton({
       aria-label={label}
       aria-current={isActive ? "page" : undefined}
       className={[
-        "inline-flex size-10 items-center justify-center rounded-xl border transition-colors duration-200",
+        "inline-flex size-11 items-center justify-center rounded-xl border transition-colors duration-200",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
         isActive
           ? "border-primary/30 bg-primary/10 text-primary"

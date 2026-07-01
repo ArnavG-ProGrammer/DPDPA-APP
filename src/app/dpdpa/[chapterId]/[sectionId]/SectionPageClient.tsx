@@ -245,7 +245,7 @@ function QuizTab({
 }: { questions: { question: string; options: string[]; answer: number; explanation?: string }[]; sectionId: string; onUpdate: () => void }) {
   const [answers, setAnswers] = useState<Record<number, number | null>>({});
   const [correct, setCorrect] = useState<Set<number>>(new Set());
-  const accent = "var(--primary)";
+  const accent = "var(--primary-text)";
 
   useEffect(() => {
     const p = getProgress();
@@ -478,7 +478,7 @@ export function SectionPageClient({
           <span style={{ color: "var(--muted-foreground)" }}>/</span>
           <Link href="/dpdpa" style={{ color: "var(--muted-foreground)", textDecoration: "none", whiteSpace: "nowrap" }}>DPDPA</Link>
           <span style={{ color: "var(--muted-foreground)" }}>/</span>
-          <span style={{ color: "var(--primary)", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <span style={{ color: "var(--primary-text)", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {section.title}
           </span>
         </div>
@@ -497,14 +497,14 @@ export function SectionPageClient({
         {/* Header */}
         <div className="fade-up" style={{ marginBottom: 32 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
-            <span className="tabular-nums" style={{ fontFamily: "var(--font-mono)", fontSize: 11, padding: "4px 12px", borderRadius: 20, background: tint("var(--primary)", 8), border: `1px solid ${tint("var(--primary)", 24)}`, color: "var(--primary)" }}>
+            <span className="tabular-nums" style={{ fontFamily: "var(--font-mono)", fontSize: 11, padding: "4px 12px", borderRadius: 20, background: tint("var(--primary)", 8), border: `1px solid ${tint("var(--primary)", 24)}`, color: "var(--primary-text)" }}>
               Chapter {chapter.number} · §{section.number}
             </span>
             <span style={{ fontSize: 11, padding: "4px 10px", borderRadius: 20, background: tint("var(--brand-teal)", 8), border: `1px solid ${tint("var(--brand-teal)", 22)}`, color: "var(--brand-teal-text)" }}>
               India · DPDPA 2023
             </span>
             {hasFlashcards && <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, padding: "4px 10px", borderRadius: 20, background: tint("var(--brand-amber)", 8), border: `1px solid ${tint("var(--brand-amber)", 22)}`, color: "var(--brand-amber-text)" }}><Layers size={12} /> Flashcards</span>}
-            {hasQuiz && <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, padding: "4px 10px", borderRadius: 20, background: tint("var(--primary)", 8), border: `1px solid ${tint("var(--primary)", 22)}`, color: "var(--primary)" }}><Brain size={12} /> Quiz</span>}
+            {hasQuiz && <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, padding: "4px 10px", borderRadius: 20, background: tint("var(--primary)", 8), border: `1px solid ${tint("var(--primary)", 22)}`, color: "var(--primary-text)" }}><Brain size={12} /> Quiz</span>}
           </div>
           <h1 className="font-display" style={{ fontSize: "clamp(1.7rem, 4vw, 2.4rem)", fontWeight: 700, color: "var(--foreground)", lineHeight: 1.2, marginBottom: 8, letterSpacing: "-0.02em" }}>
             {section.title}

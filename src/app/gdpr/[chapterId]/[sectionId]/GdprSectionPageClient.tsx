@@ -104,7 +104,7 @@ function FlashcardsTab({ cards, sectionId, onUpdate }: { cards: { front: string;
 function QuizTab({ questions, sectionId, onUpdate }: { questions: { question: string; options: string[]; answer: number; explanation?: string }[]; sectionId: string; onUpdate: () => void }) {
   const [answers, setAnswers] = useState<Record<number, number | null>>({});
   const [correct, setCorrect] = useState<Set<number>>(new Set());
-  const accent = "var(--primary)";
+  const accent = "var(--primary-text)";
   useEffect(() => { const p = getProgress(); setCorrect(new Set(p.quiz[sectionId] ?? [])); }, [sectionId]);
   const select = (qIdx: number, optIdx: number) => {
     if (answers[qIdx] !== undefined) return;
@@ -294,7 +294,7 @@ export function GdprSectionPageClient({ params }: { params: { chapterId: string;
               EU · GDPR 2016/679
             </span>
             {hasFlashcards && <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, padding: "4px 10px", borderRadius: 20, background: tint("var(--brand-amber)", 8), border: `1px solid ${tint("var(--brand-amber)", 22)}`, color: "var(--brand-amber-text)" }}><Layers size={12} /> Flashcards</span>}
-            {hasQuiz && <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, padding: "4px 10px", borderRadius: 20, background: tint("var(--primary)", 8), border: `1px solid ${tint("var(--primary)", 22)}`, color: "var(--primary)" }}><Brain size={12} /> Quiz</span>}
+            {hasQuiz && <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, padding: "4px 10px", borderRadius: 20, background: tint("var(--primary)", 8), border: `1px solid ${tint("var(--primary)", 22)}`, color: "var(--primary-text)" }}><Brain size={12} /> Quiz</span>}
           </div>
           <h1 className="font-display" style={{ fontSize: "clamp(1.7rem, 4vw, 2.4rem)", fontWeight: 700, color: "var(--foreground)", lineHeight: 1.2, marginBottom: 8, letterSpacing: "-0.02em" }}>{section.title}</h1>
           <div style={{ fontSize: 13, color: "var(--muted-foreground)" }}>{chapter.title} · GDPR 2016/679</div>
