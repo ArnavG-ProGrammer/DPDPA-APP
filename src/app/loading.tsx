@@ -1,35 +1,16 @@
 export default function Loading() {
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <div style={{ textAlign: "center" }}>
+    <div className="flex min-h-dvh items-center justify-center">
+      <div className="text-center">
         <div
+          className="mx-auto mb-4 size-10 rounded-full border-[3px]"
           style={{
-            width: 40,
-            height: 40,
-            border: "3px solid rgba(245,158,11,0.2)",
-            borderTopColor: "#F59E0B",
-            borderRadius: "50%",
+            borderColor: "color-mix(in srgb, var(--primary) 20%, transparent)",
+            borderTopColor: "var(--primary)",
             animation: "spin 0.8s linear infinite",
-            margin: "0 auto 16px",
           }}
         />
-        <div
-          style={{
-            fontFamily: "var(--font-ibm), sans-serif",
-            fontSize: 12,
-            color: "#4B5563",
-            letterSpacing: "0.15em",
-          }}
-        >
-          LOADING
-        </div>
+        <div className="text-xs uppercase tracking-[0.15em] text-muted-foreground">Loading</div>
       </div>
     </div>
   );

@@ -23,84 +23,82 @@ export function ComingSoonPage({
   accent,
   features,
 }: ComingSoonPageProps) {
-  const colors = {
-    blue: {
-      gradient: "from-blue-500 to-indigo-500",
-      glow: "bg-blue-500/[0.06]",
-      border: "border-blue-500/20",
-      bg: "bg-blue-500/8",
-      text: "text-blue-400",
-      badge: "border-blue-500/30 bg-blue-500/10 text-blue-400",
-      btn: "from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 shadow-blue-500/20 hover:shadow-blue-500/40",
-    },
-    emerald: {
-      gradient: "from-emerald-500 to-teal-500",
-      glow: "bg-emerald-500/[0.06]",
-      border: "border-emerald-500/20",
-      bg: "bg-emerald-500/8",
-      text: "text-emerald-400",
-      badge: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
-      btn: "from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-emerald-500/20 hover:shadow-emerald-500/40",
-    },
-  };
-  const c = colors[accent];
+  // Map the two legacy accent names onto brand tokens.
+  const accentVar = accent === "blue" ? "var(--info)" : "var(--brand-teal)";
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: "#0a0d14" }}>
-      {/* Ambient */}
-      <div className={`pointer-events-none fixed top-[-20%] left-[10%] w-[70vw] h-[70vh] rounded-full ${c.glow} blur-[140px]`} />
+    <div className="relative flex min-h-dvh flex-col bg-background">
+      {/* Ambient glow */}
+      <div
+        className="pointer-events-none fixed left-[10%] top-[-20%] h-[70vh] w-[70vw] rounded-full blur-[140px]"
+        style={{ background: `color-mix(in srgb, ${accentVar} 8%, transparent)` }}
+        aria-hidden="true"
+      />
 
       {/* Navbar */}
       <nav
-        className="fixed top-0 left-0 right-0 z-50 h-16 backdrop-blur-xl"
-        style={{ background: "rgba(10,13,20,0.85)", borderBottom: "1px solid rgba(201,162,39,0.1)" }}
+        className="glass fixed left-0 right-0 top-0 z-40 h-14 border-b border-border"
+        style={{ background: "var(--glass-nav)" }}
       >
-        <div className="h-full max-w-7xl mx-auto px-6 flex items-center gap-4">
-          <Link href="/" className="flex items-center gap-1.5 text-slate-500 hover:text-white transition-colors text-sm">
-            <ArrowLeft className="w-4 h-4" />
+        <div className="mx-auto flex h-full max-w-7xl items-center gap-4 px-4 sm:px-6">
+          <Link href="/" className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
+            <ArrowLeft className="size-4" />
             Home
           </Link>
-          <div className="w-px h-5 bg-white/10" />
+          <div className="h-5 w-px bg-border" />
           <DataCrestLogo size="sm" href="/" showWordmark={false} />
-          <span className={`text-sm font-semibold ${c.text}`}>{subtitle}</span>
+          <span className="text-sm font-semibold" style={{ color: accentVar }}>{subtitle}</span>
         </div>
       </nav>
 
       {/* Content */}
-      <div className="flex-1 flex items-center justify-center px-6 pt-16">
-        <div className="max-w-xl w-full text-center">
-          {/* Big emoji */}
-          <div className="text-7xl mb-6 animate-float" style={{ display: "inline-block" }}>
+      <div className="flex flex-1 items-center justify-center px-6 pt-20">
+        <div className="w-full max-w-xl text-center">
+          {/* Decorative hero glyph */}
+          <div className="animate-float mb-6 inline-block text-7xl" aria-hidden="true">
             {icon}
           </div>
 
           {/* Badge */}
-          <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-medium mb-6 ${c.badge}`}>
-            <Clock className="w-3 h-3" />
-            Coming Soon
-            <span className="text-lg">{flag}</span>
+          <div
+            className="mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium"
+            style={{
+              color: accentVar,
+              borderColor: `color-mix(in srgb, ${accentVar} 30%, transparent)`,
+              background: `color-mix(in srgb, ${accentVar} 10%, transparent)`,
+            }}
+          >
+            <Clock className="size-3" />
+            Coming soon
+            <span className="text-base" aria-hidden="true">{flag}</span>
           </div>
 
           {/* Title */}
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
+          <h1 className="mb-4 font-display text-4xl font-bold leading-tight text-foreground md:text-5xl">
             {title}
           </h1>
 
-          <p className="text-slate-400 text-base leading-relaxed mb-10">{description}</p>
+          <p className="mb-10 text-base leading-relaxed text-muted-foreground">{description}</p>
 
           {/* Feature preview */}
-          <div className={`rounded-2xl border ${c.border} ${c.bg} p-6 mb-8 text-left`}>
-            <div className="flex items-center gap-2 mb-4">
-              <Sparkles className={`w-4 h-4 ${c.text}`} />
-              <span className={`text-xs font-semibold uppercase tracking-widest ${c.text}`}>
+          <div
+            className="mb-8 rounded-2xl border p-6 text-left"
+            style={{
+              borderColor: `color-mix(in srgb, ${accentVar} 22%, transparent)`,
+              background: `color-mix(in srgb, ${accentVar} 7%, transparent)`,
+            }}
+          >
+            <div className="mb-4 flex items-center gap-2">
+              <Sparkles className="size-4" style={{ color: accentVar }} />
+              <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: accentVar }}>
                 What&apos;s coming
               </span>
             </div>
             <div className="space-y-3">
               {features.map((f) => (
                 <div key={f.text} className="flex items-center gap-3">
-                  <span className="text-lg">{f.icon}</span>
-                  <span className="text-slate-300 text-sm">{f.text}</span>
+                  <span className="text-lg" aria-hidden="true">{f.icon}</span>
+                  <span className="text-sm text-card-foreground">{f.text}</span>
                 </div>
               ))}
             </div>
@@ -108,19 +106,16 @@ export function ComingSoonPage({
 
           {/* Notify button */}
           <button
-            className={`inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r ${c.btn} text-white font-semibold shadow-xl transition-all hover:scale-105`}
+            className="inline-flex items-center gap-2 rounded-2xl bg-primary px-8 py-4 font-semibold text-primary-foreground shadow-lg transition-[transform,filter] duration-200 hover:-translate-y-0.5 hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:translate-y-0"
           >
-            <Bell className="w-4 h-4" />
+            <Bell className="size-4" />
             Notify me when it&apos;s ready
           </button>
 
           {/* Back link */}
           <div className="mt-6">
-            <Link
-              href="/dpdpa"
-              className={`text-sm ${c.text} hover:underline`}
-            >
-              In the meantime, explore DPDPA 2023 →
+            <Link href="/dpdpa" className="text-sm hover:underline" style={{ color: accentVar }}>
+              In the meantime, explore DPDPA 2023
             </Link>
           </div>
         </div>

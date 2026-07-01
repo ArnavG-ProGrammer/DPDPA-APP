@@ -1,28 +1,22 @@
 import type { Metadata } from "next";
-import { Playfair_Display, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Poppins, Inter } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/contexts/theme";
 import { ChatFAB } from "@/components/chatbot/ChatFAB";
 import { AuthPrompt } from "@/components/auth/AuthPrompt";
 import { Analytics } from "@vercel/analytics/react";
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["400", "600", "700"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
-const ibmPlexSans = IBM_Plex_Sans({
-  variable: "--font-ibm",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  display: "swap",
-});
-
-const ibmPlexMono = IBM_Plex_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -47,30 +41,37 @@ export const metadata: Metadata = {
   },
 };
 
+// Applies the saved (or system) theme before first paint to avoid a flash.
+const themeScript = `(function(){try{var t=localStorage.getItem('dc-theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${playfair.variable} ${ibmPlexSans.variable} ${ibmPlexMono.variable} h-full`}
-      style={{ colorScheme: "dark" }}
+      className={`${poppins.variable} ${inter.variable} h-full`}
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="min-h-full antialiased">
-        {/* Persistent background layers */}
-        <div className="bg-base"       aria-hidden="true" />
-        <div className="dot-grid"      aria-hidden="true" />
-        <div className="noise-overlay" aria-hidden="true" />
-        <div className="rule-lines"    aria-hidden="true" />
+        <ThemeProvider>
+          {/* Persistent ambient background layers (token-tinted, behind content) */}
+          <div className="bg-base" aria-hidden="true" />
+          <div className="dot-grid" aria-hidden="true" />
+          <div className="noise-overlay" aria-hidden="true" />
 
-        {/* Page content */}
-        <div style={{ position: "relative", zIndex: 1 }}>
-          {children}
-        </div>
+          {/* Page content */}
+          <div style={{ position: "relative", zIndex: 1 }}>
+            {children}
+          </div>
 
-        {/* Auth prompt for guests */}
-        <AuthPrompt />
+          {/* Auth prompt for guests */}
+          <AuthPrompt />
 
-        {/* AI Assistant FAB */}
-        <ChatFAB />
+          {/* AI Assistant FAB */}
+          <ChatFAB />
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>

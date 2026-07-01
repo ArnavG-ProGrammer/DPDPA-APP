@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MessageCircle, X } from "lucide-react";
 import { ChatWindow } from "./ChatWindow";
 
 export function ChatFAB() {
@@ -10,29 +11,13 @@ export function ChatFAB() {
     <>
       {open && <ChatWindow onClose={() => setOpen(false)} />}
       <button
-        onClick={() => setOpen(o => !o)}
-        aria-label="Open AI assistant"
-        style={{
-          position: "fixed", bottom: 24, right: 24, zIndex: 101,
-          width: 54, height: 54, borderRadius: "50%",
-          background: open ? "#F59E0B" : "rgba(245,158,11,0.90)",
-          border: "2px solid rgba(245,158,11,0.5)",
-          cursor: "pointer", fontSize: 22,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          boxShadow: "0 4px 24px rgba(245,158,11,0.35), 0 0 0 0 rgba(245,158,11,0.4)",
-          transition: "transform 0.2s, background 0.2s, box-shadow 0.2s",
-          transform: open ? "rotate(10deg) scale(1.05)" : "rotate(0deg) scale(1)",
-        }}
-        onMouseEnter={e => {
-          (e.currentTarget as HTMLElement).style.transform = "scale(1.08)";
-          (e.currentTarget as HTMLElement).style.boxShadow = "0 6px 32px rgba(245,158,11,0.5), 0 0 0 6px rgba(245,158,11,0.12)";
-        }}
-        onMouseLeave={e => {
-          (e.currentTarget as HTMLElement).style.transform = open ? "rotate(10deg) scale(1.05)" : "scale(1)";
-          (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 24px rgba(245,158,11,0.35), 0 0 0 0 rgba(245,158,11,0.4)";
-        }}
+        onClick={() => setOpen((o) => !o)}
+        aria-label={open ? "Close AI assistant" : "Open AI assistant"}
+        aria-expanded={open}
+        className="fixed bottom-6 right-6 z-[101] flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-[transform,box-shadow] duration-200 hover:scale-105 hover:shadow-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:scale-95"
+        style={{ boxShadow: "0 8px 28px color-mix(in srgb, var(--primary) 40%, transparent)" }}
       >
-        {open ? "✕" : "🤖"}
+        {open ? <X size={22} /> : <MessageCircle size={22} />}
       </button>
     </>
   );
