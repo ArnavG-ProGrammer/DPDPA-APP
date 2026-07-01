@@ -2,7 +2,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Copy, Check, Star } from "lucide-react";
+import {
+  ArrowLeft, ArrowRight, Copy, Check, Star,
+  FileText, Layers, Brain, PenLine, ClipboardList, Landmark, StickyNote,
+  type LucideIcon,
+} from "lucide-react";
 import { dpdpaAct } from "@/data/dpdpa";
 import {
   markRead, markFlashcardsComplete, markQuizCorrect,
@@ -11,17 +15,15 @@ import {
 
 type Tab = "content" | "flashcards" | "quiz" | "author" | "rules" | "gdpr" | "notes";
 
-const TABS: { id: Tab; icon: string; label: string }[] = [
-  { id: "content",    icon: "📄", label: "Content" },
-  { id: "flashcards", icon: "🃏", label: "Flashcards" },
-  { id: "quiz",       icon: "🧠", label: "Quiz" },
-  { id: "author",     icon: "✍️", label: "Author's Note" },
-  { id: "rules",      icon: "📋", label: "DPDP Rules" },
-  { id: "gdpr",       icon: "🏛️", label: "GDPR Link" },
-  { id: "notes",      icon: "📝", label: "My Notes" },
+const TABS: { id: Tab; icon: LucideIcon; label: string }[] = [
+  { id: "content",    icon: FileText,      label: "Content" },
+  { id: "flashcards", icon: Layers,        label: "Flashcards" },
+  { id: "quiz",       icon: Brain,         label: "Quiz" },
+  { id: "author",     icon: PenLine,       label: "Author's Note" },
+  { id: "rules",      icon: ClipboardList, label: "DPDP Rules" },
+  { id: "gdpr",       icon: Landmark,      label: "GDPR Link" },
+  { id: "notes",      icon: StickyNote,    label: "My Notes" },
 ];
-
-const ACCENT = "#F59E0B";
 
 // Maps an article number extracted from "Article X - ..." to a GDPR section URL
 const GDPR_ARTICLE_MAP: Record<number, { chapterId: string; sectionId: string }> = {
@@ -71,10 +73,10 @@ function ruleUrl(ref: string): string {
   return `/dpdp-rules#rule-${match[1]}`;
 }
 
-const crumbStyle: React.CSSProperties = {
-  fontSize: 12, fontFamily: "var(--font-ibm), sans-serif",
-  color: "#4B5563", textDecoration: "none", whiteSpace: "nowrap",
-};
+// A reusable tinted "panel" wrapper for the cross-reference / commentary tabs.
+function tint(color: string, pct: number) {
+  return `color-mix(in srgb, ${color} ${pct}%, transparent)`;
+}
 
 // ─── Score Widget ─────────────────────────────────────────────────────────────
 function ScoreWidget({ score, pct }: { score: number; pct: number }) {
@@ -86,28 +88,23 @@ function ScoreWidget({ score, pct }: { score: number; pct: number }) {
     <div style={{
       display: "flex", alignItems: "center", gap: 10,
       padding: "8px 16px", borderRadius: 40,
-      background: "rgba(245,158,11,0.07)", border: "1px solid rgba(245,158,11,0.2)",
+      background: tint("var(--primary)", 8), border: `1px solid ${tint("var(--primary)", 22)}`,
     }}>
       <svg width={52} height={52} style={{ transform: "rotate(-90deg)", flexShrink: 0 }}>
-        <circle cx={26} cy={26} r={radius} fill="none" stroke="rgba(245,158,11,0.12)" strokeWidth={4} />
-        <circle cx={26} cy={26} r={radius} fill="none" stroke="#F59E0B" strokeWidth={4}
+        <circle cx={26} cy={26} r={radius} fill="none" stroke={tint("var(--primary)", 15)} strokeWidth={4} />
+        <circle cx={26} cy={26} r={radius} fill="none" stroke="var(--primary)" strokeWidth={4}
           strokeDasharray={`${dash} ${circ}`}
           strokeLinecap="round"
           style={{ transition: "stroke-dasharray 0.6s ease" }}
         />
       </svg>
       <div>
-        <div style={{
-          fontFamily: "var(--font-mono), monospace", fontSize: 20, fontWeight: 700,
-          color: "#F59E0B", lineHeight: 1,
-        }}>
-          {score}<span style={{ fontSize: 11, color: "#4B5563" }}>/1000</span>
+        <div className="tabular-nums" style={{ fontFamily: "var(--font-mono)", fontSize: 20, fontWeight: 700, color: "var(--primary)", lineHeight: 1 }}>
+          {score}<span style={{ fontSize: 11, color: "var(--muted-foreground)" }}>/1000</span>
         </div>
-        <div style={{ fontFamily: "var(--font-ibm), sans-serif", fontSize: 10, color: "#4B5563", marginTop: 2 }}>
-          Learning Score
-        </div>
+        <div style={{ fontSize: 10, color: "var(--muted-foreground)", marginTop: 2 }}>Learning Score</div>
       </div>
-      <Star size={13} color="#F59E0B" fill="#F59E0B" style={{ flexShrink: 0 }} />
+      <Star size={13} color="var(--primary)" fill="var(--primary)" style={{ flexShrink: 0 }} />
     </div>
   );
 }
@@ -120,6 +117,8 @@ function FlashcardsTab({
   const [flipped, setFlipped] = useState(false);
   const [seen, setSeen] = useState<Set<number>>(new Set());
   const [completed, setCompleted] = useState(false);
+  const accent = "var(--brand-amber)";
+  const accentText = "var(--brand-amber-text)";
 
   useEffect(() => {
     const p = getProgress();
@@ -127,7 +126,6 @@ function FlashcardsTab({
   }, [sectionId]);
 
   const card = cards[current];
-  const progress = seen.size;
 
   const markSeen = useCallback(() => {
     const next = new Set(seen);
@@ -141,30 +139,26 @@ function FlashcardsTab({
   }, [current, seen, cards.length, completed, sectionId, onUpdate]);
 
   const handleFlip = () => {
-    setFlipped(f => !f);
+    setFlipped((f) => !f);
     if (!flipped) markSeen();
   };
 
-  const next = () => {
-    setFlipped(false);
-    setCurrent(c => (c + 1) % cards.length);
-  };
-  const prev = () => {
-    setFlipped(false);
-    setCurrent(c => (c - 1 + cards.length) % cards.length);
-  };
+  const next = () => { setFlipped(false); setCurrent((c) => (c + 1) % cards.length); };
+  const prev = () => { setFlipped(false); setCurrent((c) => (c - 1 + cards.length) % cards.length); };
 
   return (
-    <div style={{ background: "#0B1526", borderRadius: 18, border: "1px solid rgba(249,115,22,0.15)", padding: 28 }}>
+    <div style={{ background: "var(--card)", borderRadius: 18, border: "1px solid var(--border)", padding: 28 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(249,115,22,0.1)", border: "1px solid rgba(249,115,22,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🃏</div>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: tint(accent, 12), border: `1px solid ${tint(accent, 30)}`, color: accentText, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Layers size={16} />
+          </div>
           <div>
-            <div style={{ fontFamily: "var(--font-ibm), sans-serif", fontWeight: 600, color: "#F97316", fontSize: 13 }}>Flashcards</div>
-            <div style={{ fontFamily: "var(--font-ibm), sans-serif", fontSize: 11, color: "#4B5563" }}>Click card to reveal answer</div>
+            <div style={{ fontWeight: 600, color: accentText, fontSize: 13 }}>Flashcards</div>
+            <div style={{ fontSize: 11, color: "var(--muted-foreground)" }}>Click card to reveal answer</div>
           </div>
         </div>
-        <div style={{ fontFamily: "var(--font-mono), monospace", fontSize: 13, color: "#4B5563" }}>
+        <div className="tabular-nums" style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--muted-foreground)" }}>
           {current + 1} / {cards.length}
         </div>
       </div>
@@ -172,72 +166,73 @@ function FlashcardsTab({
       {/* Progress dots */}
       <div style={{ display: "flex", gap: 6, marginBottom: 24 }}>
         {cards.map((_, i) => (
-          <div key={i} onClick={() => { setFlipped(false); setCurrent(i); }} style={{
-            height: 4, flex: 1, borderRadius: 2, cursor: "pointer",
-            background: seen.has(i) ? "#F97316" : (i === current ? "rgba(249,115,22,0.4)" : "rgba(255,255,255,0.06)"),
-            transition: "background 0.3s",
-          }} />
+          <button
+            key={i}
+            onClick={() => { setFlipped(false); setCurrent(i); }}
+            aria-label={`Go to card ${i + 1}`}
+            style={{
+              height: 4, flex: 1, borderRadius: 2, cursor: "pointer", border: "none", padding: 0,
+              background: seen.has(i) ? accent : i === current ? tint(accent, 40) : "var(--border)",
+              transition: "background 0.3s",
+            }}
+          />
         ))}
       </div>
 
       {/* Card */}
       <div
         onClick={handleFlip}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleFlip(); } }}
         style={{
           position: "relative", cursor: "pointer",
           minHeight: 200, borderRadius: 16, marginBottom: 20,
-          background: flipped ? "rgba(249,115,22,0.08)" : "rgba(255,255,255,0.03)",
-          border: `1px solid ${flipped ? "rgba(249,115,22,0.3)" : "rgba(255,255,255,0.08)"}`,
+          background: flipped ? tint(accent, 8) : "var(--secondary)",
+          border: `1px solid ${flipped ? tint(accent, 30) : "var(--border)"}`,
           transition: "all 0.35s",
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
           padding: 32, textAlign: "center",
         }}
       >
-        <div style={{ fontFamily: "var(--font-ibm), sans-serif", fontSize: 10, color: flipped ? "#F97316" : "#4B5563", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 16, fontWeight: 600 }}>
-          {flipped ? "✦ Answer" : "? Question"}
+        <div style={{ fontSize: 10, color: flipped ? accentText : "var(--muted-foreground)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 16, fontWeight: 600 }}>
+          {flipped ? "Answer" : "Question"}
         </div>
-        <div style={{
-          fontFamily: flipped ? "var(--font-ibm), sans-serif" : "var(--font-playfair), Georgia, serif",
-          fontSize: flipped ? 14.5 : 17,
-          lineHeight: 1.65,
-          color: flipped ? "#94A3B8" : "#F0EAD6",
-          fontWeight: flipped ? 400 : 600,
-        }}>
+        <div
+          className={flipped ? undefined : "font-display"}
+          style={{ fontSize: flipped ? 15 : 18, lineHeight: 1.6, color: flipped ? "var(--muted-foreground)" : "var(--foreground)", fontWeight: flipped ? 400 : 600 }}
+        >
           {flipped ? card.back : card.front}
         </div>
         {!flipped && (
-          <div style={{ marginTop: 20, fontSize: 11, color: "#4B5563", fontFamily: "var(--font-ibm), sans-serif" }}>
-            Tap to reveal →
-          </div>
+          <div style={{ marginTop: 20, fontSize: 11, color: "var(--muted-foreground)" }}>Tap to reveal</div>
         )}
       </div>
 
       <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
         <button onClick={prev} style={{
-          padding: "10px 24px", borderRadius: 10,
-          background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)",
-          color: "#94A3B8", fontFamily: "var(--font-ibm), sans-serif", fontSize: 13,
-          cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
+          padding: "10px 24px", borderRadius: 12,
+          background: "var(--secondary)", border: "1px solid var(--border)", color: "var(--foreground)",
+          fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
         }}>
-          <ArrowLeft size={13} /> Prev
+          <ArrowLeft size={14} /> Prev
         </button>
         <button onClick={next} style={{
-          padding: "10px 24px", borderRadius: 10,
-          background: "#F97316", border: "none",
-          color: "#030712", fontFamily: "var(--font-ibm), sans-serif", fontSize: 13, fontWeight: 600,
-          cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
+          padding: "10px 24px", borderRadius: 12,
+          background: accent, border: "none", color: "var(--brand-amber-foreground)",
+          fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
         }}>
-          Next <ArrowRight size={13} />
+          Next <ArrowRight size={14} />
         </button>
       </div>
 
       {completed && (
         <div style={{
           marginTop: 20, padding: "14px 20px", borderRadius: 12,
-          background: "rgba(249,115,22,0.07)", border: "1px solid rgba(249,115,22,0.2)",
-          textAlign: "center", fontFamily: "var(--font-ibm), sans-serif", fontSize: 13, color: "#F97316",
+          background: tint("var(--success)", 10), border: `1px solid ${tint("var(--success)", 25)}`,
+          textAlign: "center", fontSize: 13, color: "var(--success-text)", fontWeight: 500,
         }}>
-          🔥 All flashcards reviewed! +2 points earned
+          All flashcards reviewed. +2 points earned.
         </div>
       )}
     </div>
@@ -250,6 +245,7 @@ function QuizTab({
 }: { questions: { question: string; options: string[]; answer: number; explanation?: string }[]; sectionId: string; onUpdate: () => void }) {
   const [answers, setAnswers] = useState<Record<number, number | null>>({});
   const [correct, setCorrect] = useState<Set<number>>(new Set());
+  const accent = "var(--primary)";
 
   useEffect(() => {
     const p = getProgress();
@@ -257,12 +253,12 @@ function QuizTab({
   }, [sectionId]);
 
   const select = (qIdx: number, optIdx: number) => {
-    if (answers[qIdx] !== undefined) return; // already answered
-    setAnswers(a => ({ ...a, [qIdx]: optIdx }));
+    if (answers[qIdx] !== undefined) return;
+    setAnswers((a) => ({ ...a, [qIdx]: optIdx }));
     const q = questions[qIdx];
     if (optIdx === q.answer && !correct.has(qIdx)) {
       markQuizCorrect(sectionId, qIdx);
-      setCorrect(c => new Set([...c, qIdx]));
+      setCorrect((c) => new Set([...c, qIdx]));
       onUpdate();
     }
   };
@@ -271,12 +267,14 @@ function QuizTab({
   const score = questions.filter((_, i) => answers[i] === questions[i].answer).length;
 
   return (
-    <div style={{ background: "#0B1526", borderRadius: 18, border: "1px solid rgba(139,92,246,0.15)", padding: 28 }}>
+    <div style={{ background: "var(--card)", borderRadius: 18, border: "1px solid var(--border)", padding: 28 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
-        <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🧠</div>
+        <div style={{ width: 36, height: 36, borderRadius: 10, background: tint(accent, 12), border: `1px solid ${tint(accent, 30)}`, color: accent, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Brain size={16} />
+        </div>
         <div>
-          <div style={{ fontFamily: "var(--font-ibm), sans-serif", fontWeight: 600, color: "#8B5CF6", fontSize: 13 }}>Quick Quiz</div>
-          <div style={{ fontFamily: "var(--font-ibm), sans-serif", fontSize: 11, color: "#4B5563" }}>{questions.length} question{questions.length !== 1 ? "s" : ""} · select to answer</div>
+          <div style={{ fontWeight: 600, color: accent, fontSize: 13 }}>Quick Quiz</div>
+          <div style={{ fontSize: 11, color: "var(--muted-foreground)" }}>{questions.length} question{questions.length !== 1 ? "s" : ""} · select to answer</div>
         </div>
       </div>
 
@@ -288,47 +286,41 @@ function QuizTab({
 
           return (
             <div key={qIdx}>
-              <div style={{
-                fontFamily: "var(--font-playfair), Georgia, serif",
-                fontSize: 16, color: "#F0EAD6", lineHeight: 1.5, marginBottom: 14,
-              }}>
-                <span style={{ color: "#8B5CF6", fontFamily: "var(--font-mono), monospace", fontSize: 12 }}>Q{qIdx + 1}. </span>
+              <div className="font-display" style={{ fontSize: 16, fontWeight: 600, color: "var(--foreground)", lineHeight: 1.4, marginBottom: 14 }}>
+                <span className="tabular-nums" style={{ color: accent, fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 700 }}>Q{qIdx + 1}. </span>
                 {q.question}
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {q.options.map((opt, oIdx) => {
-                  let bg = "rgba(255,255,255,0.02)";
-                  let border = "rgba(255,255,255,0.08)";
-                  let color = "#94A3B8";
+                  let bg = "var(--secondary)";
+                  let border = "var(--border)";
+                  let color = "var(--foreground)";
                   if (revealed) {
-                    if (oIdx === q.answer) { bg = "rgba(16,185,129,0.08)"; border = "rgba(16,185,129,0.3)"; color = "#10B981"; }
-                    else if (oIdx === chosen && !isCorrect) { bg = "rgba(239,68,68,0.08)"; border = "rgba(239,68,68,0.3)"; color = "#EF4444"; }
-                  } else {
-                    bg = "rgba(255,255,255,0.02)";
+                    if (oIdx === q.answer) { bg = tint("var(--success)", 10); border = tint("var(--success)", 32); color = "var(--success-text)"; }
+                    else if (oIdx === chosen && !isCorrect) { bg = tint("var(--destructive)", 10); border = tint("var(--destructive)", 32); color = "var(--destructive)"; }
                   }
 
                   return (
-                    <button key={oIdx} onClick={() => select(qIdx, oIdx)} style={{
+                    <button key={oIdx} onClick={() => select(qIdx, oIdx)} disabled={revealed} style={{
                       display: "flex", alignItems: "center", gap: 12,
-                      padding: "13px 16px", borderRadius: 10, cursor: revealed ? "default" : "pointer",
-                      background: bg, border: `1px solid ${border}`,
-                      textAlign: "left", transition: "all 0.25s",
+                      padding: "13px 16px", borderRadius: 12, cursor: revealed ? "default" : "pointer",
+                      background: bg, border: `1px solid ${border}`, textAlign: "left", transition: "all 0.2s",
                     }}
-                      onMouseEnter={e => { if (!revealed) (e.currentTarget as HTMLElement).style.borderColor = "rgba(139,92,246,0.35)"; }}
-                      onMouseLeave={e => { if (!revealed) (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.08)"; }}
+                      onMouseEnter={(e) => { if (!revealed) e.currentTarget.style.borderColor = tint(accent, 40); }}
+                      onMouseLeave={(e) => { if (!revealed) e.currentTarget.style.borderColor = "var(--border)"; }}
                     >
-                      <span style={{
-                        width: 26, height: 26, borderRadius: 6, flexShrink: 0,
-                        background: revealed && oIdx === q.answer ? "#10B981" : (revealed && oIdx === chosen ? "#EF4444" : "rgba(255,255,255,0.05)"),
-                        border: `1px solid ${revealed && oIdx === q.answer ? "#10B981" : "rgba(255,255,255,0.15)"}`,
+                      <span className="tabular-nums" style={{
+                        width: 26, height: 26, borderRadius: 8, flexShrink: 0,
+                        background: revealed && oIdx === q.answer ? "var(--success)" : revealed && oIdx === chosen ? "var(--destructive)" : "var(--muted)",
+                        border: `1px solid ${revealed && oIdx === q.answer ? "var(--success)" : "var(--border)"}`,
                         display: "flex", alignItems: "center", justifyContent: "center",
-                        fontFamily: "var(--font-mono), monospace", fontSize: 11, color: revealed && (oIdx === q.answer || oIdx === chosen) ? "#030712" : "#4B5563",
-                        fontWeight: 600,
+                        fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 600,
+                        color: revealed && (oIdx === q.answer || oIdx === chosen) ? "var(--primary-foreground)" : "var(--muted-foreground)",
                       }}>
                         {revealed && oIdx === q.answer ? "✓" : revealed && oIdx === chosen ? "✗" : String.fromCharCode(65 + oIdx)}
                       </span>
-                      <span style={{ fontFamily: "var(--font-ibm), sans-serif", fontSize: 13.5, color, lineHeight: 1.5 }}>
+                      <span style={{ fontSize: 13.5, color: revealed ? color : "var(--foreground)", lineHeight: 1.5 }}>
                         {opt}
                       </span>
                     </button>
@@ -338,14 +330,13 @@ function QuizTab({
 
               {revealed && q.explanation && (
                 <div style={{
-                  marginTop: 12, padding: "14px 16px", borderRadius: 10,
-                  background: isCorrect ? "rgba(16,185,129,0.06)" : "rgba(245,158,11,0.06)",
-                  border: `1px solid ${isCorrect ? "rgba(16,185,129,0.2)" : "rgba(245,158,11,0.2)"}`,
-                  fontFamily: "var(--font-ibm), sans-serif", fontSize: 13, lineHeight: 1.65,
-                  color: "#94A3B8",
+                  marginTop: 12, padding: "14px 16px", borderRadius: 12,
+                  background: isCorrect ? tint("var(--success)", 8) : tint("var(--brand-amber)", 8),
+                  border: `1px solid ${isCorrect ? tint("var(--success)", 22) : tint("var(--brand-amber)", 22)}`,
+                  fontSize: 13, lineHeight: 1.65, color: "var(--muted-foreground)",
                 }}>
-                  <span style={{ color: isCorrect ? "#10B981" : "#F59E0B", fontWeight: 600, marginRight: 8 }}>
-                    {isCorrect ? "✓ Correct!" : "✗ Not quite."}</span>
+                  <span style={{ color: isCorrect ? "var(--success-text)" : "var(--brand-amber-text)", fontWeight: 600, marginRight: 8 }}>
+                    {isCorrect ? "Correct." : "Not quite."}</span>
                   {q.explanation}
                 </div>
               )}
@@ -357,19 +348,40 @@ function QuizTab({
       {allDone && (
         <div style={{
           marginTop: 28, padding: "18px 24px", borderRadius: 12,
-          background: score === questions.length ? "rgba(16,185,129,0.08)" : "rgba(245,158,11,0.07)",
-          border: `1px solid ${score === questions.length ? "rgba(16,185,129,0.25)" : "rgba(245,158,11,0.2)"}`,
+          background: score === questions.length ? tint("var(--success)", 10) : tint("var(--brand-amber)", 9),
+          border: `1px solid ${score === questions.length ? tint("var(--success)", 26) : tint("var(--brand-amber)", 24)}`,
           textAlign: "center",
         }}>
-          <div style={{ fontFamily: "var(--font-playfair), Georgia, serif", fontSize: 22, color: score === questions.length ? "#10B981" : "#F59E0B", marginBottom: 6 }}>
+          <div className="font-display tabular-nums" style={{ fontSize: 22, fontWeight: 700, color: score === questions.length ? "var(--success-text)" : "var(--brand-amber-text)", marginBottom: 6 }}>
             {score}/{questions.length} correct
           </div>
-          <div style={{ fontFamily: "var(--font-ibm), sans-serif", fontSize: 13, color: "#4B5563" }}>
-            {score === questions.length ? "🎉 Perfect score! " : score > 0 ? "📖 Good effort — review the explanations above. " : "💡 Re-read the content and try again. "}
+          <div style={{ fontSize: 13, color: "var(--muted-foreground)" }}>
+            {score === questions.length ? "Perfect score. " : score > 0 ? "Good effort, review the explanations above. " : "Re-read the content and try again. "}
             +{score * 3} points added to your score.
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// ─── Cross-reference / commentary panel ───────────────────────────────────────
+function AccentPanel({
+  color, textColor, icon, title, subtitle, children,
+}: { color: string; textColor: string; icon: LucideIcon; title: string; subtitle: string; children: React.ReactNode }) {
+  const Icon = icon;
+  return (
+    <div style={{ background: tint(color, 5), borderLeft: `3px solid ${color}`, borderRadius: "0 18px 18px 0", padding: 28 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+        <div style={{ width: 36, height: 36, borderRadius: 10, background: tint(color, 12), border: `1px solid ${tint(color, 30)}`, color: textColor, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Icon size={16} />
+        </div>
+        <div>
+          <div style={{ fontWeight: 600, color: textColor, fontSize: 13 }}>{title}</div>
+          <div style={{ fontSize: 11, color: "var(--muted-foreground)" }}>{subtitle}</div>
+        </div>
+      </div>
+      {children}
     </div>
   );
 }
@@ -387,8 +399,8 @@ export function SectionPageClient({
   const [score, setScore] = useState(0);
   const [scorePct, setScorePct] = useState(0);
 
-  const allSectionsFlat = dpdpaAct.chapters.flatMap(ch =>
-    ch.sections.map(s => ({ ...s, chapterId: ch.id }))
+  const allSectionsFlat = dpdpaAct.chapters.flatMap((ch) =>
+    ch.sections.map((s) => ({ ...s, chapterId: ch.id }))
   );
 
   const refreshScore = useCallback(() => {
@@ -397,10 +409,10 @@ export function SectionPageClient({
     setScorePct(pct);
   }, []); // eslint-disable-line
 
-  const chapter = dpdpaAct.chapters.find(c => c.id === params.chapterId);
-  const section = chapter?.sections.find(s => s.id === params.sectionId);
+  const chapter = dpdpaAct.chapters.find((c) => c.id === params.chapterId);
+  const section = chapter?.sections.find((s) => s.id === params.sectionId);
 
-  const sIdx = allSectionsFlat.findIndex(s => s.id === params.sectionId);
+  const sIdx = allSectionsFlat.findIndex((s) => s.id === params.sectionId);
   const prevSec = sIdx > 0 ? allSectionsFlat[sIdx - 1] : null;
   const nextSec = sIdx < allSectionsFlat.length - 1 ? allSectionsFlat[sIdx + 1] : null;
 
@@ -427,14 +439,13 @@ export function SectionPageClient({
 
   if (!chapter || !section) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
-          <h2 style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "#F0EAD6", marginBottom: 12 }}>
+          <h2 className="font-display" style={{ color: "var(--foreground)", marginBottom: 12, fontSize: 22 }}>
             Section not found
           </h2>
-          <Link href="/dpdpa" style={{ color: "#F59E0B", fontFamily: "var(--font-ibm), sans-serif", textDecoration: "none" }}>
-            ← Back to DPDPA
+          <Link href="/dpdpa" style={{ color: "var(--primary)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <ArrowLeft size={14} /> Back to DPDPA
           </Link>
         </div>
       </div>
@@ -444,27 +455,30 @@ export function SectionPageClient({
   const hasFlashcards = (section.flashcards?.length ?? 0) > 0;
   const hasQuiz = (section.quiz?.length ?? 0) > 0;
 
-  const visibleTabs = TABS.filter(t => {
+  const visibleTabs = TABS.filter((t) => {
     if (t.id === "flashcards" && !hasFlashcards) return false;
     if (t.id === "quiz" && !hasQuiz) return false;
     return true;
   });
 
   return (
-    <div style={{ minHeight: "100vh" }}>
-      <nav style={{
-        position: "sticky", top: 0, zIndex: 40,
-        background: "rgba(3,7,18,0.92)", backdropFilter: "blur(20px)",
-        borderBottom: "1px solid rgba(245,158,11,0.12)",
-        padding: "0 16px", height: 56,
-        display: "flex", alignItems: "center", gap: 8,
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, flex: 1, overflow: "hidden" }}>
-          <Link href="/" style={crumbStyle}>Home</Link>
-          <span style={{ color: "#4B5563", fontSize: 12 }}>›</span>
-          <Link href="/dpdpa" style={crumbStyle}>DPDPA</Link>
-          <span style={{ color: "#4B5563", fontSize: 12 }}>›</span>
-          <span style={{ ...crumbStyle, color: ACCENT, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis" }}>
+    <div style={{ minHeight: "100dvh" }}>
+      <nav
+        className="glass"
+        style={{
+          position: "sticky", top: 0, zIndex: 40,
+          background: "var(--glass-nav)",
+          borderBottom: "1px solid var(--border)",
+          padding: "0 16px", height: 56,
+          display: "flex", alignItems: "center", gap: 8,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flex: 1, overflow: "hidden", fontSize: 12 }}>
+          <Link href="/" style={{ color: "var(--muted-foreground)", textDecoration: "none", whiteSpace: "nowrap" }}>Home</Link>
+          <span style={{ color: "var(--muted-foreground)" }}>/</span>
+          <Link href="/dpdpa" style={{ color: "var(--muted-foreground)", textDecoration: "none", whiteSpace: "nowrap" }}>DPDPA</Link>
+          <span style={{ color: "var(--muted-foreground)" }}>/</span>
+          <span style={{ color: "var(--primary)", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {section.title}
           </span>
         </div>
@@ -472,14 +486,10 @@ export function SectionPageClient({
       </nav>
 
       <div style={{ maxWidth: 820, margin: "0 auto", padding: "40px 24px 120px" }}>
-        <Link href="/dpdpa" style={{
-          display: "inline-flex", alignItems: "center", gap: 6,
-          color: "#4B5563", textDecoration: "none", fontSize: 13,
-          fontFamily: "var(--font-ibm), sans-serif",
-          marginBottom: 32, transition: "color 0.2s",
-        }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = ACCENT; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#4B5563"; }}
+        <Link
+          href="/dpdpa"
+          className="hover:text-primary"
+          style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--muted-foreground)", textDecoration: "none", fontSize: 13, marginBottom: 32, transition: "color 0.2s" }}
         >
           <ArrowLeft size={14} /> All Chapters
         </Link>
@@ -487,78 +497,61 @@ export function SectionPageClient({
         {/* Header */}
         <div className="fade-up" style={{ marginBottom: 32 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
-            <span style={{
-              fontFamily: "var(--font-mono), monospace", fontSize: 11, padding: "4px 12px",
-              borderRadius: 20, background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)", color: ACCENT,
-            }}>
+            <span className="tabular-nums" style={{ fontFamily: "var(--font-mono)", fontSize: 11, padding: "4px 12px", borderRadius: 20, background: tint("var(--primary)", 8), border: `1px solid ${tint("var(--primary)", 24)}`, color: "var(--primary)" }}>
               Chapter {chapter.number} · §{section.number}
             </span>
-            <span style={{
-              fontSize: 11, padding: "4px 10px", borderRadius: 20,
-              background: "rgba(6,182,212,0.08)", border: "1px solid rgba(6,182,212,0.2)",
-              color: "#06B6D4", fontFamily: "var(--font-ibm), sans-serif",
-            }}>
-              India 🇮🇳 · DPDPA 2023
+            <span style={{ fontSize: 11, padding: "4px 10px", borderRadius: 20, background: tint("var(--brand-teal)", 8), border: `1px solid ${tint("var(--brand-teal)", 22)}`, color: "var(--brand-teal-text)" }}>
+              India · DPDPA 2023
             </span>
-            {hasFlashcards && <span style={{ fontSize: 11, padding: "4px 10px", borderRadius: 20, background: "rgba(249,115,22,0.08)", border: "1px solid rgba(249,115,22,0.2)", color: "#F97316", fontFamily: "var(--font-ibm), sans-serif" }}>🃏 Flashcards</span>}
-            {hasQuiz && <span style={{ fontSize: 11, padding: "4px 10px", borderRadius: 20, background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.2)", color: "#8B5CF6", fontFamily: "var(--font-ibm), sans-serif" }}>🧠 Quiz</span>}
+            {hasFlashcards && <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, padding: "4px 10px", borderRadius: 20, background: tint("var(--brand-amber)", 8), border: `1px solid ${tint("var(--brand-amber)", 22)}`, color: "var(--brand-amber-text)" }}><Layers size={12} /> Flashcards</span>}
+            {hasQuiz && <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, padding: "4px 10px", borderRadius: 20, background: tint("var(--primary)", 8), border: `1px solid ${tint("var(--primary)", 22)}`, color: "var(--primary)" }}><Brain size={12} /> Quiz</span>}
           </div>
-          <h1 style={{
-            fontFamily: "var(--font-playfair), Georgia, serif",
-            fontSize: "clamp(1.7rem, 4vw, 2.4rem)", fontWeight: 700,
-            color: "#F0EAD6", lineHeight: 1.2, marginBottom: 8,
-          }}>
+          <h1 className="font-display" style={{ fontSize: "clamp(1.7rem, 4vw, 2.4rem)", fontWeight: 700, color: "var(--foreground)", lineHeight: 1.2, marginBottom: 8, letterSpacing: "-0.02em" }}>
             {section.title}
           </h1>
-          <div style={{ fontFamily: "var(--font-ibm), sans-serif", fontSize: 13, color: "#4B5563" }}>
+          <div style={{ fontSize: 13, color: "var(--muted-foreground)" }}>
             {chapter.title} · DPDPA 2023
           </div>
         </div>
 
         {/* Tab Bar */}
-        <div className="fade-up-1" style={{
-          display: "flex", gap: 4, flexWrap: "wrap",
-          background: "#0B1526", borderRadius: 14, padding: 6,
-          border: "1px solid rgba(245,158,11,0.1)", marginBottom: 28,
-        }}>
-          {visibleTabs.map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
-              padding: "8px 14px", borderRadius: 10, border: "none", cursor: "pointer",
-              fontFamily: "var(--font-ibm), sans-serif", fontSize: 12, fontWeight: 500,
-              display: "flex", alignItems: "center", gap: 6,
-              transition: "all 0.2s",
-              background: activeTab === tab.id ? ACCENT : "transparent",
-              color: activeTab === tab.id ? "#030712" : "#4B5563",
-              whiteSpace: "nowrap",
-            }}>
-              <span>{tab.icon}</span>
-              {tab.label}
-            </button>
-          ))}
+        <div className="fade-up-1" style={{ display: "flex", gap: 4, flexWrap: "wrap", background: "var(--card)", borderRadius: 14, padding: 6, border: "1px solid var(--border)", marginBottom: 28 }}>
+          {visibleTabs.map((tab) => {
+            const Icon = tab.icon;
+            const active = activeTab === tab.id;
+            return (
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)} aria-pressed={active} style={{
+                padding: "8px 14px", borderRadius: 10, border: "none", cursor: "pointer",
+                fontSize: 12, fontWeight: 500, display: "flex", alignItems: "center", gap: 6,
+                transition: "all 0.2s",
+                background: active ? "var(--primary)" : "transparent",
+                color: active ? "var(--primary-foreground)" : "var(--muted-foreground)",
+                whiteSpace: "nowrap",
+              }}>
+                <Icon size={14} />
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* Tab Content */}
         <div className="fade-up-2">
-
           {activeTab === "content" && (
-            <div style={{ background: "#0B1526", borderRadius: 18, border: "1px solid rgba(245,158,11,0.12)", padding: 28 }}>
+            <div style={{ background: "var(--card)", borderRadius: 18, border: "1px solid var(--border)", padding: 28 }}>
               <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
                 <button onClick={copyContent} style={{
                   display: "flex", alignItems: "center", gap: 6,
-                  padding: "6px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)",
+                  padding: "6px 14px", borderRadius: 8, border: "1px solid var(--border)",
                   background: "transparent", cursor: "pointer",
-                  color: copied ? ACCENT : "#4B5563",
-                  fontFamily: "var(--font-ibm), sans-serif", fontSize: 12, transition: "color 0.2s",
+                  color: copied ? "var(--success-text)" : "var(--muted-foreground)",
+                  fontSize: 12, transition: "color 0.2s",
                 }}>
-                  {copied ? <Check size={12} /> : <Copy size={12} />}
-                  {copied ? "Copied!" : "Copy"}
+                  {copied ? <Check size={13} /> : <Copy size={13} />}
+                  {copied ? "Copied" : "Copy"}
                 </button>
               </div>
-              <pre style={{
-                fontFamily: "var(--font-ibm), sans-serif",
-                fontSize: 14.5, lineHeight: 1.9, color: "#94A3B8",
-                whiteSpace: "pre-wrap", margin: 0,
-              }}>
+              <pre style={{ fontFamily: "var(--font-sans)", fontSize: 15, lineHeight: 1.85, color: "var(--foreground)", whiteSpace: "pre-wrap", margin: 0 }}>
                 {section.content}
               </pre>
             </div>
@@ -573,137 +566,107 @@ export function SectionPageClient({
           )}
 
           {activeTab === "author" && (
-            <div style={{ background: "rgba(245,158,11,0.05)", borderLeft: "3px solid #F59E0B", borderRadius: "0 18px 18px 0", padding: 28 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>✍️</div>
-                <div>
-                  <div style={{ fontFamily: "var(--font-ibm), sans-serif", fontWeight: 600, color: ACCENT, fontSize: 13 }}>Author&apos;s Commentary</div>
-                  <div style={{ fontFamily: "var(--font-ibm), sans-serif", fontSize: 11, color: "#4B5563" }}>Expert legal analysis</div>
-                </div>
+            <AccentPanel color="var(--brand-amber)" textColor="var(--brand-amber-text)" icon={PenLine} title="Author's Commentary" subtitle="Expert legal analysis">
+              <div style={{ fontSize: 15, lineHeight: 1.8, color: "var(--muted-foreground)", whiteSpace: "pre-wrap" }}>
+                {"authorNote" in section && section.authorNote ? String(section.authorNote) : "Coming soon. Expert commentary on this provision will be published here."}
               </div>
-              <div style={{ fontFamily: "var(--font-ibm), sans-serif", fontSize: 14.5, lineHeight: 1.85, color: "#94A3B8", whiteSpace: "pre-wrap" }}>
-                {"authorNote" in section && section.authorNote ? String(section.authorNote) : "Coming Soon — Expert commentary on this provision will be published here."}
-              </div>
-            </div>
+            </AccentPanel>
           )}
 
           {activeTab === "rules" && (
-            <div style={{ background: "rgba(6,182,212,0.05)", borderLeft: "3px solid #06B6D4", borderRadius: "0 18px 18px 0", padding: 28 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(6,182,212,0.12)", border: "1px solid rgba(6,182,212,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>📋</div>
-                <div>
-                  <div style={{ fontFamily: "var(--font-ibm), sans-serif", fontWeight: 600, color: "#06B6D4", fontSize: 13 }}>DPDP Rules 2025</div>
-                  <div style={{ fontFamily: "var(--font-ibm), sans-serif", fontSize: 11, color: "#4B5563" }}>Cross-reference to implementing rules</div>
-                </div>
-              </div>
+            <AccentPanel color="var(--brand-teal)" textColor="var(--brand-teal-text)" icon={ClipboardList} title="DPDP Rules 2025" subtitle="Cross-reference to implementing rules">
               {section.relatedRules && section.relatedRules.length > 0 ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {section.relatedRules.map((ref, i) => (
                     <Link key={i} href={`${ruleUrl(ref)}?from=/dpdpa/${params.chapterId}/${params.sectionId}&fromTitle=${encodeURIComponent("§" + section.number + " " + section.title)}`} style={{
                       display: "flex", alignItems: "center", justifyContent: "space-between",
                       padding: "12px 16px", borderRadius: 12,
-                      background: "rgba(6,182,212,0.04)", border: "1px solid rgba(6,182,212,0.2)",
+                      background: tint("var(--brand-teal)", 5), border: `1px solid ${tint("var(--brand-teal)", 22)}`,
                       textDecoration: "none", transition: "background 0.2s, border-color 0.2s",
                     }}
-                      onMouseEnter={e => {
-                        (e.currentTarget as HTMLElement).style.background = "rgba(6,182,212,0.1)";
-                        (e.currentTarget as HTMLElement).style.borderColor = "rgba(6,182,212,0.4)";
-                      }}
-                      onMouseLeave={e => {
-                        (e.currentTarget as HTMLElement).style.background = "rgba(6,182,212,0.04)";
-                        (e.currentTarget as HTMLElement).style.borderColor = "rgba(6,182,212,0.2)";
-                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = tint("var(--brand-teal)", 12); e.currentTarget.style.borderColor = tint("var(--brand-teal)", 42); }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = tint("var(--brand-teal)", 5); e.currentTarget.style.borderColor = tint("var(--brand-teal)", 22); }}
                     >
-                      <span style={{ fontFamily: "var(--font-ibm), sans-serif", fontSize: 13, color: "#06B6D4" }}>{ref}</span>
-                      <ArrowRight size={14} color="#06B6D4" />
+                      <span style={{ fontSize: 13, color: "var(--brand-teal-text)" }}>{ref}</span>
+                      <ArrowRight size={14} color="var(--brand-teal-text)" />
                     </Link>
                   ))}
                 </div>
               ) : (
-                <div style={{ fontFamily: "var(--font-ibm), sans-serif", fontSize: 14, color: "#4B5563" }}>
+                <div style={{ fontSize: 14, color: "var(--muted-foreground)" }}>
                   No specific DPDP Rules 2025 directly cross-reference this section.
                 </div>
               )}
-            </div>
+            </AccentPanel>
           )}
 
           {activeTab === "gdpr" && (
-            <div style={{ background: "rgba(59,130,246,0.05)", borderLeft: "3px solid #3B82F6", borderRadius: "0 18px 18px 0", padding: 28 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(59,130,246,0.12)", border: "1px solid rgba(59,130,246,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🏛️</div>
-                <div>
-                  <div style={{ fontFamily: "var(--font-ibm), sans-serif", fontWeight: 600, color: "#3B82F6", fontSize: 13 }}>GDPR Correspondence</div>
-                  <div style={{ fontFamily: "var(--font-ibm), sans-serif", fontSize: 11, color: "#4B5563" }}>EU General Data Protection Regulation</div>
-                </div>
-              </div>
+            <AccentPanel color="var(--info)" textColor="var(--info-text)" icon={Landmark} title="GDPR Correspondence" subtitle="EU General Data Protection Regulation">
               {section.relatedGDPR && section.relatedGDPR.length > 0 ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {section.relatedGDPR.map((ref, i) => (
                     <Link key={i} href={`${gdprArticleUrl(ref)}?from=/dpdpa/${params.chapterId}/${params.sectionId}&fromTitle=${encodeURIComponent("§" + section.number + " " + section.title)}`} style={{
                       display: "flex", alignItems: "center", justifyContent: "space-between",
                       padding: "12px 16px", borderRadius: 12,
-                      background: "rgba(59,130,246,0.04)", border: "1px solid rgba(59,130,246,0.2)",
+                      background: tint("var(--info)", 5), border: `1px solid ${tint("var(--info)", 22)}`,
                       textDecoration: "none", transition: "background 0.2s, border-color 0.2s",
                     }}
-                      onMouseEnter={e => {
-                        (e.currentTarget as HTMLElement).style.background = "rgba(59,130,246,0.1)";
-                        (e.currentTarget as HTMLElement).style.borderColor = "rgba(59,130,246,0.4)";
-                      }}
-                      onMouseLeave={e => {
-                        (e.currentTarget as HTMLElement).style.background = "rgba(59,130,246,0.04)";
-                        (e.currentTarget as HTMLElement).style.borderColor = "rgba(59,130,246,0.2)";
-                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = tint("var(--info)", 12); e.currentTarget.style.borderColor = tint("var(--info)", 42); }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = tint("var(--info)", 5); e.currentTarget.style.borderColor = tint("var(--info)", 22); }}
                     >
-                      <span style={{ fontFamily: "var(--font-ibm), sans-serif", fontSize: 13, color: "#3B82F6" }}>{ref}</span>
-                      <ArrowRight size={14} color="#3B82F6" />
+                      <span style={{ fontSize: 13, color: "var(--info-text)" }}>{ref}</span>
+                      <ArrowRight size={14} color="var(--info-text)" />
                     </Link>
                   ))}
                 </div>
               ) : (
-                <div style={{ fontFamily: "var(--font-ibm), sans-serif", fontSize: 14, color: "#4B5563" }}>
+                <div style={{ fontSize: 14, color: "var(--muted-foreground)" }}>
                   No direct GDPR equivalent for this provision.
                 </div>
               )}
-            </div>
+            </AccentPanel>
           )}
 
           {activeTab === "notes" && (
-            <div style={{ background: "#0B1526", borderRadius: 18, border: "1px solid rgba(245,158,11,0.12)", padding: 28 }}>
+            <div style={{ background: "var(--card)", borderRadius: 18, border: "1px solid var(--border)", padding: 28 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>📝</div>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: tint("var(--primary)", 10), border: `1px solid ${tint("var(--primary)", 24)}`, color: "var(--primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <StickyNote size={16} />
+                </div>
                 <div>
-                  <div style={{ fontFamily: "var(--font-ibm), sans-serif", fontWeight: 600, color: "#F0EAD6", fontSize: 13 }}>My Notes</div>
-                  <div style={{ fontFamily: "var(--font-ibm), sans-serif", fontSize: 11, color: "#4B5563" }}>Saved locally in your browser</div>
+                  <div style={{ fontWeight: 600, color: "var(--foreground)", fontSize: 13 }}>My Notes</div>
+                  <div style={{ fontSize: 11, color: "var(--muted-foreground)" }}>Saved locally in your browser</div>
                 </div>
               </div>
               <textarea
                 value={note}
-                onChange={e => setNote(e.target.value)}
+                onChange={(e) => setNote(e.target.value)}
                 placeholder="Write your notes, questions, or insights about this section..."
+                aria-label="Section notes"
                 style={{
                   width: "100%", minHeight: 200, padding: 16,
-                  background: "rgba(255,255,255,0.03)", border: "1px solid rgba(245,158,11,0.2)",
+                  background: "var(--secondary)", border: "1px solid var(--border)",
                   borderRadius: 12, resize: "vertical",
-                  fontFamily: "var(--font-ibm), sans-serif", fontSize: 14, lineHeight: 1.7, color: "#F0EAD6",
+                  fontFamily: "var(--font-sans)", fontSize: 14, lineHeight: 1.7, color: "var(--foreground)",
                   outline: "none", boxSizing: "border-box", transition: "border-color 0.2s",
                 }}
-                onFocus={e => { e.target.style.borderColor = ACCENT; }}
-                onBlur={e => { e.target.style.borderColor = "rgba(245,158,11,0.2)"; }}
+                onFocus={(e) => { e.target.style.borderColor = "var(--ring)"; }}
+                onBlur={(e) => { e.target.style.borderColor = "var(--border)"; }}
               />
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 14 }}>
                 <button onClick={saveNote} style={{
-                  padding: "10px 24px", borderRadius: 10, border: "none", cursor: "pointer",
-                  background: ACCENT, color: "#030712",
-                  fontFamily: "var(--font-ibm), sans-serif", fontWeight: 600, fontSize: 13, transition: "background 0.2s",
+                  padding: "10px 24px", borderRadius: 12, border: "none", cursor: "pointer",
+                  background: "var(--primary)", color: "var(--primary-foreground)",
+                  fontWeight: 600, fontSize: 13, transition: "filter 0.2s",
                 }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#FCD34D"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = ACCENT; }}
+                  onMouseEnter={(e) => { e.currentTarget.style.filter = "brightness(1.08)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.filter = "brightness(1)"; }}
                 >
                   Save Note
                 </button>
                 {saved && (
-                  <span style={{ display: "flex", alignItems: "center", gap: 6, color: "#059669", fontSize: 13, fontFamily: "var(--font-ibm), sans-serif" }}>
-                    <Check size={14} /> Saved ✓
+                  <span style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--success-text)", fontSize: 13 }}>
+                    <Check size={14} /> Saved
                   </span>
                 )}
               </div>
@@ -712,25 +675,21 @@ export function SectionPageClient({
         </div>
 
         {/* Prev / Next */}
-        <div className="fade-up-3" style={{
-          display: "flex", justifyContent: "space-between", alignItems: "center",
-          marginTop: 52, paddingTop: 28, borderTop: "1px solid rgba(245,158,11,0.1)",
-          gap: 12, flexWrap: "wrap",
-        }}>
+        <div className="fade-up-3" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 52, paddingTop: 28, borderTop: "1px solid var(--border)", gap: 12, flexWrap: "wrap" }}>
           {prevSec ? (
             <Link href={`/dpdpa/${prevSec.chapterId}/${prevSec.id}`} style={{
               display: "flex", alignItems: "center", gap: 10,
               padding: "12px 20px", borderRadius: 12,
-              background: "#0B1526", border: "1px solid rgba(255,255,255,0.08)",
+              background: "var(--card)", border: "1px solid var(--border)",
               textDecoration: "none", transition: "border-color 0.2s", maxWidth: "45%",
             }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(245,158,11,0.25)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.08)"; }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = tint("var(--primary)", 32); }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; }}
             >
-              <ArrowLeft size={14} color="#4B5563" />
+              <ArrowLeft size={14} color="var(--muted-foreground)" />
               <div>
-                <div style={{ fontSize: 10, color: "#4B5563", fontFamily: "var(--font-ibm), sans-serif", marginBottom: 2 }}>Previous</div>
-                <div style={{ fontSize: 13, color: "#94A3B8", fontFamily: "var(--font-ibm), sans-serif", fontWeight: 500 }}>
+                <div style={{ fontSize: 10, color: "var(--muted-foreground)", marginBottom: 2 }}>Previous</div>
+                <div style={{ fontSize: 13, color: "var(--foreground)", fontWeight: 500 }}>
                   {prevSec.title.length > 30 ? prevSec.title.slice(0, 30) + "…" : prevSec.title}
                 </div>
               </div>
@@ -741,19 +700,19 @@ export function SectionPageClient({
             <Link href={`/dpdpa/${nextSec.chapterId}/${nextSec.id}`} style={{
               display: "flex", alignItems: "center", gap: 10,
               padding: "12px 20px", borderRadius: 12,
-              background: "#0B1526", border: "1px solid rgba(255,255,255,0.08)",
+              background: "var(--card)", border: "1px solid var(--border)",
               textDecoration: "none", transition: "border-color 0.2s", maxWidth: "45%", textAlign: "right",
             }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(245,158,11,0.25)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.08)"; }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = tint("var(--primary)", 32); }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; }}
             >
               <div>
-                <div style={{ fontSize: 10, color: "#4B5563", fontFamily: "var(--font-ibm), sans-serif", marginBottom: 2 }}>Next</div>
-                <div style={{ fontSize: 13, color: "#94A3B8", fontFamily: "var(--font-ibm), sans-serif", fontWeight: 500 }}>
+                <div style={{ fontSize: 10, color: "var(--muted-foreground)", marginBottom: 2 }}>Next</div>
+                <div style={{ fontSize: 13, color: "var(--foreground)", fontWeight: 500 }}>
                   {nextSec.title.length > 30 ? nextSec.title.slice(0, 30) + "…" : nextSec.title}
                 </div>
               </div>
-              <ArrowRight size={14} color={ACCENT} />
+              <ArrowRight size={14} color="var(--primary)" />
             </Link>
           ) : <div />}
         </div>

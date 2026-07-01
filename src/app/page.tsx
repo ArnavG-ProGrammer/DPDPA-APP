@@ -15,6 +15,7 @@ const CARDS = [
     region: "India",
     year: "2023",
     accent: "var(--brand-amber)",
+    accentText: "var(--brand-amber-text)",
     delay: "0.06s",
   },
   {
@@ -26,6 +27,7 @@ const CARDS = [
     region: "India",
     year: "2025",
     accent: "var(--brand-teal)",
+    accentText: "var(--brand-teal-text)",
     delay: "0.12s",
   },
   {
@@ -37,6 +39,7 @@ const CARDS = [
     region: "EU",
     year: "2018",
     accent: "var(--info)",
+    accentText: "var(--info-text)",
     delay: "0.18s",
   },
   {
@@ -48,6 +51,7 @@ const CARDS = [
     region: "India",
     year: "2023–",
     accent: "var(--primary)",
+    accentText: "var(--primary-text)",
     delay: "0.24s",
   },
 ];
@@ -118,11 +122,11 @@ function LawCard({ card }: { card: typeof CARDS[0] }) {
               marginBottom: 18,
             }}
           >
-            <Icon size={20} color={card.accent} strokeWidth={1.75} />
+            <Icon size={20} color={card.accentText} strokeWidth={1.75} />
           </div>
 
           {/* Label */}
-          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: card.accent, marginBottom: 8 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: card.accentText, marginBottom: 8 }}>
             {card.label}
           </div>
 
@@ -142,7 +146,7 @@ function LawCard({ card }: { card: typeof CARDS[0] }) {
               style={{
                 display: "inline-flex", alignItems: "center", gap: 6,
                 padding: "4px 10px", background: tint(8), border: `1px solid ${tint(22)}`,
-                borderRadius: 999, fontSize: 11, fontWeight: 600, color: card.accent, whiteSpace: "nowrap",
+                borderRadius: 999, fontSize: 11, fontWeight: 600, color: card.accentText, whiteSpace: "nowrap",
               }}
             >
               <span aria-hidden="true">{card.region === "India" ? "🇮🇳" : "🇪🇺"}</span> {card.region}
